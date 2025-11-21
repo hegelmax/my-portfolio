@@ -244,4 +244,3 @@ export const ImagePickerModal: React.FC<ImagePickerModalProps> = ({
     </div>
   );
 };
-

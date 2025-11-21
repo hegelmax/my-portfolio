@@ -314,6 +314,14 @@
   gap: 12px;
   flex: 1 1 auto;
   min-height: 240px;
+  align-content: start;
+  align-items: start;
+}
+
+.media-picker__pagination-info {
+  text-align: right;
+  font-size: 13px;
+  color: #9ca3af;
 }
 
 .media-picker__item {
@@ -428,4 +436,3 @@
   font-size: 13px;
   color: #9ca3af;
 }
-

@@ -137,4 +137,3 @@ function admin_save_new(string $login, string $password): bool {
 
     return admin_write_config($cfg);
 }
-

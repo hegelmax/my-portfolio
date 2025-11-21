@@ -108,4 +108,3 @@ export default function ProjectsGrid({
     </div>
   );
 }
-

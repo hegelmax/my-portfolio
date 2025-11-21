@@ -51,4 +51,3 @@ echo json_encode([
     'success' => true,
     'item'    => $updated,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-

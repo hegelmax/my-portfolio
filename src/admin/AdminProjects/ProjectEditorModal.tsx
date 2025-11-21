@@ -567,4 +567,3 @@ export const ProjectEditorModal: React.FC<Props> = ({
     </>
   );
 };
-

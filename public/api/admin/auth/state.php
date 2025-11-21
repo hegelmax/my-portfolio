@@ -27,4 +27,3 @@ echo json_encode([
     'user'            => admin_is_logged_in() ? ['name' => $name] : null,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-

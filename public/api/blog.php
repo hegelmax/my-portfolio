@@ -334,4 +334,3 @@ function resizeImage(string $srcPath, string $dstPath, int $targetW, int $target
 
 	return $result;
 }
-

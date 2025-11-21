@@ -42,4 +42,3 @@ echo json_encode([
     'success' => true,
     'items'   => $newItems,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-

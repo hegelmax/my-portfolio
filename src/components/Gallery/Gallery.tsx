@@ -31,39 +31,61 @@ function shuffleArray<T>(array: T[]): T[] {
   return result;
 }
 
+const getItemCategories = (item: GalleryItem): string[] => {
+  if (Array.isArray(item.categories) && item.categories.length > 0) {
+    return item.categories;
+  }
+  if (item.category) return [item.category];
+  return [];
+};
+
 const GallerySection: React.FC<GallerySectionProps> = ({
   initialFilter,
-  config
+  config,
+  items: itemsProp,
 }) => {
   const navigate = useNavigate();
 
-  const [items, setItems]                 = useState<GalleryItem[]>(DEFAULT_ITEMS);
-  const [activeFilter, setActiveFilter]   = useState<FilterCategory>(initialFilter ?? "All");
+  const defaultFilter = initialFilter ?? config.filters[0]?.value ?? "All";
+  const [items, setItems] = useState<GalleryItem[]>(itemsProp ?? DEFAULT_ITEMS);
+  const [activeFilter, setActiveFilter] = useState<FilterCategory>(defaultFilter);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const gridRef = useRef<HTMLDivElement | null>(null);
   const isoRef = useRef<Isotope | null>(null);
 
-  const filtersWrapRef                                = useRef<HTMLDivElement | null>(null);
-  const [filtersStickyStyle, setFiltersStickyStyle]   = useState<React.CSSProperties>({});
-  //const [filtersSpacerHeight, setFiltersSpacerHeight] = useState(0);
+  const filtersWrapRef = useRef<HTMLDivElement | null>(null);
+  const [filtersStickyStyle, setFiltersStickyStyle] = useState<React.CSSProperties>({});
 
   const { title, subtitle, filters, dataUrl } = config;
 
-
-  // элементы, доступные в текущем фильтре — для лайтбокса
   const visibleItems = useMemo(
     () =>
       activeFilter === "All"
         ? items
-        : items.filter((item) => item.category === activeFilter),
-    [activeFilter, items]           // ← ОБЯЗАТЕЛЬНО есть items
+        : items.filter((item) => {
+            const categories = getItemCategories(item);
+            if (categories.length === 0) return false;
+            return categories.includes(activeFilter);
+          }),
+    [activeFilter, items],
   );
 
   useEffect(() => {
+    if (itemsProp) {
+      const randomized = shuffleArray(itemsProp);
+      setItems(randomized);
+      return;
+    }
+
+    if (!dataUrl) {
+      setItems(DEFAULT_ITEMS);
+      return;
+    }
+
     fetch(dataUrl)
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to load portfolio JSON");
+        if (!res.ok) throw new Error("Failed to load gallery JSON");
         return res.json();
       })
       .then((data: GalleryItem[]) => {
@@ -71,22 +93,23 @@ const GallerySection: React.FC<GallerySectionProps> = ({
         setItems(randomized);
       })
       .catch((err) => {
-        console.error("Portfolio JSON load error:", err);
-        // в случае ошибки остаёмся на DEFAULT_ITEMS
+        console.error("Gallery JSON load error:", err);
+        setItems(DEFAULT_ITEMS);
       });
-  }, [dataUrl]);
+  }, [dataUrl, itemsProp]);
 
+  useEffect(() => {
+    if (initialFilter) {
+      setActiveFilter(initialFilter);
+    }
+  }, [initialFilter]);
 
-  // применяем initialFilter, если он меняется (например, переход по URL)
   useEffect(() => {
     if (!gridRef.current) return;
 
     const grid = gridRef.current;
 
-    // ждём, пока под текущий набор visibleItems загрузятся картинки
-    //const imgLoad =
     imagesLoaded(grid, () => {
-      // если был старый инстанс — аккуратно убиваем
       if (isoRef.current) {
         isoRef.current.destroy();
         isoRef.current = null;
@@ -105,7 +128,6 @@ const GallerySection: React.FC<GallerySectionProps> = ({
     });
 
     return () => {
-      // на всякий случай убираем инстанс, когда список видимых элементов меняется
       if (isoRef.current) {
         isoRef.current.destroy();
         isoRef.current = null;
@@ -113,12 +135,10 @@ const GallerySection: React.FC<GallerySectionProps> = ({
     };
   }, [visibleItems]);
 
-  // Хук, который включает/выключает “фиксированность”
   useEffect(() => {
     const el = filtersWrapRef.current;
     if (!el) return;
 
-    // исходная позиция блока фильтров относительно документа
     const initialTop = el.getBoundingClientRect().top + window.scrollY;
 
     const updateSticky = () => {
@@ -127,20 +147,13 @@ const GallerySection: React.FC<GallerySectionProps> = ({
       const shouldStick = window.scrollY > initialTop;
 
       if (shouldStick) {
-        const rect = filtersWrapRef.current.getBoundingClientRect();
-
         setFiltersStickyStyle({
-          position: "fixed",
-          top: 0, // если нужен отступ сверху (под header) — поменяй тут
-          left: rect.left,
-          width: rect.width,
-          zIndex: 10,
-          background: "#fff",
+          position: "sticky",
+          top: 0,
+          zIndex: 5,
         });
-        //setFiltersSpacerHeight(rect.height);
       } else {
         setFiltersStickyStyle({});
-        //setFiltersSpacerHeight(0);
       }
     };
 
@@ -154,20 +167,15 @@ const GallerySection: React.FC<GallerySectionProps> = ({
     };
   }, []);
 
-  // клик по табу
   const handleFilterClick = (filterValue: string) => {
     setActiveFilter(filterValue);
 
-    // читаем конфиг
-    const filter = filters.find(f => f.value === filterValue);
-
+    const filter = filters.find((f) => f.value === filterValue);
     if (filter?.route) {
       navigate(filter.route);
     }
   };
 
-
-  // клик по плитке -> открыть лайтбокс (только на достаточной ширине)
   const openLightbox = (id: string) => {
     const item = items.find((i) => i.id === id);
     if (!item) return;
@@ -176,7 +184,7 @@ const GallerySection: React.FC<GallerySectionProps> = ({
     img.src = item.image;
 
     img.onload = () => {
-      const shouldOpen = true;//window.innerWidth > 750; // твое текущее условие
+      const shouldOpen = true;
 
       if (shouldOpen) {
         const index = visibleItems.findIndex((i) => i.id === id);
@@ -192,7 +200,7 @@ const GallerySection: React.FC<GallerySectionProps> = ({
   const showPrev = () => {
     if (lightboxIndex === null) return;
     setLightboxIndex(
-      (lightboxIndex - 1 + visibleItems.length) % visibleItems.length
+      (lightboxIndex - 1 + visibleItems.length) % visibleItems.length,
     );
   };
 
@@ -201,7 +209,6 @@ const GallerySection: React.FC<GallerySectionProps> = ({
     setLightboxIndex((lightboxIndex + 1) % visibleItems.length);
   };
 
-
   return (
     <>
       <section
@@ -209,7 +216,6 @@ const GallerySection: React.FC<GallerySectionProps> = ({
         id="portfolio"
         data-section="portfolio"
       >
-        {/* заголовок */}
         <header className="np-portfolio__header">
           <h2 className="np-portfolio__title">{title}</h2>
           {subtitle && (
@@ -219,14 +225,13 @@ const GallerySection: React.FC<GallerySectionProps> = ({
           )}
         </header>
 
-        {/* фильтры */}
         <div
           className="np-portfolio__filters-wrap"
           ref={filtersWrapRef}
           style={filtersStickyStyle}
         >
           <div id="isotope-filters" className="np-portfolio__filters">
-            {filters.map(f => (
+            {filters.map((f) => (
               <button
                 key={f.value}
                 type="button"
@@ -242,42 +247,49 @@ const GallerySection: React.FC<GallerySectionProps> = ({
           </div>
         </div>
 
-        {/* grid для Isotope */}
         <div className="np-portfolio__grid" ref={gridRef}>
           <div className="grid-sizer" />
 
-          {visibleItems.map((item) => (
-            <article
-              key={item.id}
-              className={[
-                "grid-item",
-                "np-portfolio__item",
-                categoryClass(item.category),
-                widthClass(item.format),
-                formatClass(item.format),
-              ].join(" ")}
-              onClick={() => openLightbox(item.id)}
-            >
-              <div className="np-portfolio__item-inner">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="np-portfolio__img"
-                />
-                <div className="np-portfolio__overlay">
-                  <div className="np-portfolio__overlay-content">
-                    <h3>{item.title}</h3>
-                    <ul>
-                      <li>{item.category}</li>
-                      {item.tags.map((tag) => (
-                        <li key={tag}>#{tag}</li>
-                      ))}
-                    </ul>
+          {visibleItems.map((item) => {
+            const categories = getItemCategories(item);
+            const categoryClasses = categories
+              .map((category) => categoryClass(category))
+              .join(" ");
+            return (
+              <article
+                key={item.id}
+                className={[
+                  "grid-item",
+                  "np-portfolio__item",
+                  categoryClasses,
+                  widthClass(item.format),
+                  formatClass(item.format),
+                ].join(" ")}
+                onClick={() => openLightbox(item.id)}
+              >
+                <div className="np-portfolio__item-inner">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="np-portfolio__img"
+                  />
+                  <div className="np-portfolio__overlay">
+                    <div className="np-portfolio__overlay-content">
+                      <h3>{item.title}</h3>
+                      <ul>
+                        {categories.map((category) => (
+                          <li key={category}>{category}</li>
+                        ))}
+                        {item.tags.map((tag) => (
+                          <li key={tag}>#{tag}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       </section>
 

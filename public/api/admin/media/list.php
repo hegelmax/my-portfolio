@@ -9,7 +9,7 @@ $input = json_decode(file_get_contents('php://input'), true) ?? [];
 $tags       = $input['tags'] ?? [];
 $search     = trim($input['search'] ?? '');
 $page       = max(1, (int)($input['page'] ?? 1));
-$pageSize   = max(1, min(100, (int)($input['pageSize'] ?? 40)));
+$pageSize   = max(1, min(1000, (int)($input['pageSize'] ?? 60)));
 
 if (!is_array($tags)) $tags = [];
 
@@ -17,6 +17,7 @@ $all = media_read_all();
 
 // фильтрация
 $filtered = [];
+$tagsSet = [];
 foreach ($all as $item) {
     $ok = true;
 
@@ -40,8 +41,16 @@ foreach ($all as $item) {
     }
 
     if ($ok) {
-        $filtered[] = $item;
+    $filtered[] = $item;
+
+    if (!empty($item['tags']) && is_array($item['tags'])) {
+        foreach ($item['tags'] as $tag) {
+            if ($tag !== '') {
+                $tagsSet[$tag] = true;
+            }
+        }
     }
+}
 }
 
 // пагинация
@@ -52,12 +61,15 @@ $page = min($page, $totalPages);
 $offset = ($page - 1) * $pageSize;
 $items = array_slice($filtered, $offset, $pageSize);
 
+ksort($tagsSet, SORT_NATURAL | SORT_FLAG_CASE);
+$allTags = array_keys($tagsSet);
+
 echo json_encode([
     'success'    => true,
     'page'       => $page,
     'pageSize'   => $pageSize,
     'total'      => $total,
     'totalPages' => $totalPages,
+    'allTags'    => $allTags,
     'items'      => $items,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-

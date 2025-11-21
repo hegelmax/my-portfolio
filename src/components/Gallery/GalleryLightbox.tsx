@@ -157,4 +157,3 @@ const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
 };
 
 export default GalleryLightbox;
-

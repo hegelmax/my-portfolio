@@ -54,11 +54,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             <a href="/admin/media" className="admin-sidebar__link">
               Media Library
             </a>
-            <a href="/admin/portfolio" className="admin-sidebar__link">
-              Portfolio Gallery
-            </a>
-            <a href="/admin/publications" className="admin-sidebar__link">
-              Publications Gallery
+            <a href="/admin/galleries" className="admin-sidebar__link">
+              Galleries
             </a>
           </div>
         </nav>
@@ -72,4 +69,3 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
 };
 
 export default AdminLayout;
-

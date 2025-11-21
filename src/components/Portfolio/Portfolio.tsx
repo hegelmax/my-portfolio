@@ -19,4 +19,3 @@ export default function Portfolio({initialFilter = "All"}) {
     />
   );
 }
-

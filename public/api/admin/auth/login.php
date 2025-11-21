@@ -22,4 +22,3 @@ if (!admin_verify_credentials($login, $password)) {
 admin_login($login);
 
 echo json_encode(['success' => true], JSON_UNESCAPED_UNICODE);
-

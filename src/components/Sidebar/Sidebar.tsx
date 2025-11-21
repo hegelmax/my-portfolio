@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useGalleries } from "../../context/GalleriesContext";
+import { buildFilterRoute } from "../../utils/galleryFilters";
 
-import './Sidebar.scss';
+import "./Sidebar.scss";
 
 export default function Sidebar() {
   const [open, setOpen] = useState<string | null>(null);
   const location = useLocation();
-  const isPortfolioRoute = location.pathname.startsWith("/portfolio");
+  const { galleries } = useGalleries();
 
   const toggle = (name: string) => {
     setOpen((prev) => (prev === name ? null : name));
@@ -21,44 +23,75 @@ export default function Sidebar() {
 
         <nav>
           <ul>
-            {/* Home */}
-            <li><NavLink to="/" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>Home</NavLink></li>
-            <li><NavLink to="/about" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>About</NavLink></li>
-            <li><NavLink to="/projects" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>Projects</NavLink></li>
-
-            {/* Portfolio */}
-            <li className="dropdown">
-              <span className={isPortfolioRoute ? "current" : ""} onClick={() => toggle("portfolio")}>Portfolio</span>
-              <ul style={{display: open === "portfolio" || isPortfolioRoute ? "block" : "none",}}>
-                <li><NavLink to="/portfolio/premium" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>Premium</NavLink></li>
-                <li><NavLink to="/portfolio/rtw" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>Ready-to-Wear</NavLink></li>
-                <li><NavLink to="/portfolio/sketches" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>Sketches</NavLink></li>
-                <li><NavLink to="/portfolio/styling" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>Styling</NavLink></li>
-              </ul>
+            <li>
+              <NavLink to="/" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/about" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>
+                About
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/projects" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>
+                Projects
+              </NavLink>
             </li>
 
-            {/* Остальное можно оставить как есть */}
-            <li className="dropdown">
-              <span onClick={() => toggle("publications")}>Publications</span>
-              <ul style={{display: open === "publications" ? "block" : "none"}}>
-                <li><NavLink to="/publications/celebrities" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>Celebrities</NavLink></li>
-                <li><NavLink to="/publications/covers" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>Covers</NavLink></li>
-              </ul>
-            </li>
+            {galleries
+              .filter((gallery) => gallery.filters.some((filter) => filter.showInMenu))
+              .map((gallery) => {
+                const menuFilters = gallery.filters.filter((filter) => filter.showInMenu);
+                if (menuFilters.length === 0) return null;
+                const pathname = `/${gallery.routePath}`;
+                const isActive = location.pathname.startsWith(pathname);
+                const isOpen = open === gallery.id || isActive;
+                return (
+                  <li key={gallery.id} className="dropdown">
+                    <span
+                      className={isActive ? "current" : ""}
+                      onClick={() => toggle(gallery.id)}
+                    >
+                      {gallery.menuLabel || gallery.title}
+                    </span>
+                    <ul style={{ display: isOpen ? "block" : "none" }}>
+                      {menuFilters.map((filter) => {
+                        const route = buildFilterRoute(gallery, filter);
+                        return (
+                          <li key={filter.id}>
+                            <NavLink
+                              to={route}
+                              className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}
+                            >
+                              {filter.label}
+                            </NavLink>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </li>
+                );
+              })}
 
-            <li><NavLink to="/blog" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>Blog</NavLink></li>
-            <li><NavLink to="/contact" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>Contact</NavLink></li>
-            <li><a className="smooth-leave" target="_blank" href="https://cv.hgl.mx/nadia_hegel">CV</a></li>
+            <li>
+              <NavLink to="/blog" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>
+                Blog
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/contact" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>
+                Contact
+              </NavLink>
+            </li>
+            <li>
+              <a className="smooth-leave" target="_blank" href="https://cv.hgl.mx/nadia_hegel">
+                CV
+              </a>
+            </li>
           </ul>
         </nav>
-
-        {/*<p className="copyright">
-          © {new Date().getFullYear()} Nadia Paley
-          <br />
-          Crafted with care &amp; love.
-        </p>*/}
       </div>
     </header>
   );
 }
-

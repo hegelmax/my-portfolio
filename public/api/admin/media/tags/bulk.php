@@ -78,4 +78,3 @@ echo json_encode([
     'success' => true,
     'updated' => $updatedCount,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-

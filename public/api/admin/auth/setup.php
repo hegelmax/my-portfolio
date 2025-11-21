@@ -39,4 +39,3 @@ if (!admin_save_new($login, $password)) {
 admin_login($login);
 
 echo json_encode(['success' => true], JSON_UNESCAPED_UNICODE);
-

@@ -99,4 +99,3 @@ echo json_encode([
     'item'    => $item,
     'items'   => $items,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-

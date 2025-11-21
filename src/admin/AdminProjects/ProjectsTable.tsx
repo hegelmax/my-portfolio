@@ -81,4 +81,3 @@ export const ProjectsTable: React.FC<Props> = ({
     </div>
   );
 };
-

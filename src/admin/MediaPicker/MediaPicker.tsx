@@ -29,24 +29,13 @@ type MediaPickerProps = {
   enableBulkEditing?: boolean;
 };
 
-const MIN_CARD_WIDTH = 150;
-const MIN_CARD_HEIGHT = 180;
+const MAX_PAGE_SIZE = 100;
 
 const normalizeTags = (value: string) =>
   value
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean);
-
-const collectAllTags = (list: MediaItem[]) => {
-  const tagsSet = new Set<string>();
-  list.forEach((item) => {
-    if (Array.isArray(item.tags)) {
-      item.tags.forEach((t) => tagsSet.add(t));
-    }
-  });
-  return Array.from(tagsSet).sort((a, b) => a.localeCompare(b));
-};
 
 const MediaPicker: React.FC<MediaPickerProps> = ({
   isOpen,
@@ -63,6 +52,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
   const bulkEditingEnabled = enableBulkEditing ?? isEmbedded;
 
   const [items, setItems] = useState<MediaItem[]>([]);
+  const [itemsMap, setItemsMap] = useState<Record<string, MediaItem>>({});
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
   const [search, setSearch] = useState("");
@@ -73,8 +63,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [selectedPaths, setSelectedPaths] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(60);
+  const [totalItems, setTotalItems] = useState(0);
   const gridRef = useRef<HTMLDivElement | null>(null);
 
   const [bulkTagInput, setBulkTagInput] = useState("");
@@ -87,38 +76,76 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
   const [renaming, setRenaming] = useState(false);
   const [individualTagDeleteMode, setIndividualTagDeleteMode] = useState(false);
 
-  const load = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const resp = await fetch("/api/admin/media/list", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          tags: selectedTags,
-          search,
-          page: 1,
-          pageSize: 60,
-        }),
+  const upsertItemsMap = useCallback((updatedItems: MediaItem[]) => {
+    if (!updatedItems || updatedItems.length === 0) return;
+    setItemsMap((prev) => {
+      const next = { ...prev };
+      updatedItems.forEach((item) => {
+        if (item?.path) {
+          next[item.path] = item;
+        }
       });
+      return next;
+    });
+  }, []);
 
-      const data = await resp.json();
-      if (!data.success) {
-        throw new Error(data.error || "Failed to load media");
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const aggregated: MediaItem[] = [];
+      let allTagsSet = new Set<string>();
+      let total = Infinity;
+      let page = 1;
+      const size = MAX_PAGE_SIZE;
+
+      while (aggregated.length < total) {
+        const resp = await fetch("/api/admin/media/list.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            tags: selectedTags,
+            search,
+            page,
+            pageSize: size,
+          }),
+        });
+
+        const data = await resp.json();
+        if (!data.success) {
+          throw new Error(data.error || "Failed to load media");
+        }
+
+        const list: MediaItem[] = Array.isArray(data.items) ? data.items : [];
+        list.forEach((item) => {
+          aggregated.push(item);
+          if (Array.isArray(item.tags)) {
+            item.tags.forEach((tag) => tag && allTagsSet.add(tag));
+          }
+        });
+
+        total =
+          typeof data.total === "number"
+            ? data.total
+            : Math.max(aggregated.length, total);
+
+        if ((data.totalPages && page >= data.totalPages) || list.length === 0) {
+          break;
+        }
+        page += 1;
       }
 
-      const list: MediaItem[] = Array.isArray(data.items) ? data.items : [];
-      setItems(list);
-      setAllTags(collectAllTags(list));
-      setCurrentPage(1);
+      setItems(aggregated);
+      upsertItemsMap(aggregated);
+      setAllTags(allTagsSet.size > 0 ? Array.from(allTagsSet).sort() : []);
+      setTotalItems(aggregated.length);
     } catch (e: any) {
       setError(e?.message || "Failed to load media");
     } finally {
       setLoading(false);
     }
-  }, [selectedTags, search]);
+  }, [selectedTags, search, upsertItemsMap]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -155,6 +182,12 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
       fileInputRef.current.click();
     }
   };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setSelectedPaths([]);
+    load();
+  }, [selectedTags, search, isOpen, load]);
 
   const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = async (
     e,
@@ -195,17 +228,13 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
           throw new Error(data.error || "Upload failed");
         }
 
-        const newItem: MediaItem = data.item;
-        setItems((prev) => {
-          const next = [newItem, ...prev];
-          setAllTags(collectAllTags(next));
-          return next;
-        });
+        upsertItemsMap([data.item]);
       }
 
       setSelectedTags((prev) =>
         prev.includes(batchTag) ? prev : [...prev, batchTag],
       );
+      await load();
     } catch (e: any) {
       setError(e?.message || "Upload error");
     } finally {
@@ -225,52 +254,22 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
     onClose();
   };
 
-  useEffect(() => {
-    if (!isOpen) return;
 
-    const recalcPageSize = () => {
-      if (!isOpen) return;
+  const handleSelectAll = () => {
+    if (items.length === 0) return;
+    setSelectedPaths(items.map((item) => item.path));
+  };
 
-      const width =
-        gridRef.current?.clientWidth && gridRef.current.clientWidth > 0
-          ? gridRef.current.clientWidth
-          : window.innerWidth - (isEmbedded ? 120 : 160);
-      const availableHeight =
-        window.innerHeight - (isEmbedded ? 280 : 360);
-
-      const columns = Math.max(1, Math.floor(width / MIN_CARD_WIDTH));
-      const rows = Math.max(
-        1,
-        Math.floor(Math.max(availableHeight, 240) / MIN_CARD_HEIGHT),
-      );
-      const nextSize = Math.max(columns * rows, columns * 2);
-      setPageSize(nextSize);
-    };
-
-    recalcPageSize();
-    window.addEventListener("resize", recalcPageSize);
-
-    return () => {
-      window.removeEventListener("resize", recalcPageSize);
-    };
-  }, [isEmbedded, isOpen]);
-
-  useEffect(() => {
-    const total = Math.max(1, Math.ceil(items.length / pageSize));
-    if (currentPage > total) {
-      setCurrentPage(total);
-    }
-  }, [currentPage, items.length, pageSize]);
-
-  const pageStart = (currentPage - 1) * pageSize;
-  const pageItems = items.slice(pageStart, pageStart + pageSize);
-  const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
+  const handleClearSelection = () => {
+    setSelectedPaths([]);
+  };
 
   const selectedItems = useMemo(() => {
     if (selectedPaths.length === 0) return [];
-    const map = new Set(selectedPaths);
-    return items.filter((item) => map.has(item.path));
-  }, [items, selectedPaths]);
+    return selectedPaths
+      .map((path) => itemsMap[path])
+      .filter(Boolean) as MediaItem[];
+  }, [itemsMap, selectedPaths]);
 
   const selectionTagEntries = useMemo(() => {
     const total = selectedItems.length;
@@ -324,20 +323,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
         throw new Error(data.error || "Failed to rename tag");
       }
 
-      setItems((prev) => {
-        const next = prev.map((item) => {
-          if (!Array.isArray(item.tags)) return item;
-          if (!item.tags.includes(from)) return item;
-          const updatedTags = Array.from(
-            new Set(
-              item.tags.map((tag) => (tag === from ? trimmed : tag)).filter((t) => t !== ""),
-            ),
-          );
-          return { ...item, tags: updatedTags };
-        });
-        setAllTags(collectAllTags(next));
-        return next;
-      });
+      await load();
       setSelectedTags((prev) =>
         prev.map((tag) => (tag === from ? trimmed : tag)),
       );
@@ -369,6 +355,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
     showStatus?: boolean;
     clearInputOnSuccess?: boolean;
     skipLoadingState?: boolean;
+    refreshAfterSuccess?: boolean;
   };
 
   const mutateTags = async (
@@ -406,35 +393,14 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
         throw new Error(data.error || "Failed to update tags");
       }
 
-      const pathSet = new Set(targetPaths);
-      setItems((prev) => {
-        const next = prev.map((item) => {
-          if (!pathSet.has(item.path)) return item;
-          const prevTags = Array.isArray(item.tags) ? item.tags : [];
-          let nextTags: string[] = [];
-          if (action === "add") {
-            nextTags = Array.from(new Set([...prevTags, ...tagsList]));
-          } else if (action === "replace") {
-            nextTags = [...tagsList];
-          } else {
-            if (tagsList.length === 0) {
-              nextTags = [];
-            } else {
-              const removeSet = new Set(tagsList);
-              nextTags = prevTags.filter((tag) => !removeSet.has(tag));
-            }
-          }
-          return { ...item, tags: nextTags };
-        });
-        setAllTags(collectAllTags(next));
-        return next;
-      });
-
       if (options.clearInputOnSuccess) {
         setBulkTagInput("");
       }
       if (shouldShowStatus) {
         setBulkStatus("Теги обновлены");
+      }
+      if (options.refreshAfterSuccess !== false) {
+        await load();
       }
     } catch (e: any) {
       if (shouldShowStatus) {
@@ -457,6 +423,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
     const targetPaths = pathsOverride ?? selectedPaths;
     const mergedOptions: MutationOptions = {
       clearInputOnSuccess: !tagsOverride,
+      refreshAfterSuccess: true,
       ...options,
     };
     return mutateTags(action, tagsList, targetPaths, mergedOptions);
@@ -485,6 +452,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
     mutateTags("remove", [tag], [path], {
       showStatus: false,
       skipLoadingState: true,
+      refreshAfterSuccess: true,
     });
   };
 
@@ -542,6 +510,22 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
           onClick={() => setIndividualTagDeleteMode((prev) => !prev)}
         >
           ❌
+        </button>
+        <button
+          type="button"
+          className="media-picker__btn media-picker__btn--ghost"
+          onClick={handleSelectAll}
+          disabled={items.length === 0}
+        >
+          Select all
+        </button>
+        <button
+          type="button"
+          className="media-picker__btn media-picker__btn--ghost"
+          onClick={handleClearSelection}
+          disabled={selectedPaths.length === 0}
+        >
+          Clear selection
         </button>
       </div>
       <div className="media-picker__toolbar-right">
@@ -745,7 +729,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
           <div className="media-picker__status">Loading media...</div>
         )}
 
-        {!loading && !error && pageItems.length === 0 && (
+        {!loading && !error && items.length === 0 && (
           <div className="media-picker__status">
             Медиа не найдены. Попробуйте изменить фильтры.
           </div>
@@ -753,7 +737,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
 
         {!loading &&
           !error &&
-          pageItems.map((item) => {
+          items.map((item) => {
             const isSelected = selectedPaths.includes(item.path);
             return (
               <button
@@ -802,32 +786,9 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
             );
           })}
       </div>
-
-      {totalPages > 1 && (
-        <div className="media-picker__pagination">
-          <button
-            type="button"
-            className="media-picker__btn media-picker__btn--ghost"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-          >
-            Previous
-          </button>
-          <span>
-            Page {currentPage} / {totalPages}
-          </span>
-          <button
-            type="button"
-            className="media-picker__btn media-picker__btn--ghost"
-            disabled={currentPage === totalPages}
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-            }
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <div className="media-picker__pagination-info">
+        Total images: {totalItems}
+      </div>
 
       <div className="media-picker__footer">
         <div className="media-picker__selected-info">
@@ -863,4 +824,3 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
 };
 
 export default MediaPicker;
-

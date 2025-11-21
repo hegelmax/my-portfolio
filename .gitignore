@@ -11,6 +11,8 @@ lerna-debug.log*
 data
 public/cache
 public/images
+public/img/portfolio
+public/img/publications
 
 node_modules
 dist

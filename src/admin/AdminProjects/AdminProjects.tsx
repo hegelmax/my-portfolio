@@ -252,4 +252,3 @@ const AdminProjects: React.FC = () => {
 };
 
 export default AdminProjects;
-

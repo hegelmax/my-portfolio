@@ -33,4 +33,3 @@ export type ProjectsState = {
   error: string | null;
   items: Project[];
 };
-

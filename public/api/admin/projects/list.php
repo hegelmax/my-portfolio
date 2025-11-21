@@ -11,4 +11,3 @@ echo json_encode([
     'success' => true,
     'items'   => $items,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-

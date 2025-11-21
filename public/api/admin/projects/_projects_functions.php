@@ -39,4 +39,3 @@ function projects_next_id(array $items): int {
     }
     return $max + 1;
 }
-
