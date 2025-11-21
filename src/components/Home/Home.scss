@@ -1,0 +1,54 @@
+@use "../../styles" as *;
+
+.home-projects {
+  width: 100%;
+  background: $color-bg-page;
+
+  &__inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    //padding: 0 40px;
+
+    //display: flex;
+	//flex-direction: column;
+    //align-items: flex-start;
+    //justify-content: space-between;
+    //gap: 60px;
+  }
+
+  &__header {
+    max-width: 1350px;
+    margin: 0 auto 50px;
+    padding: 0 40px;
+
+    h2 {
+      font-family: $font-serif;
+      color: $color-text-main;
+      font-size: 38px;
+      font-weight: 500;
+      margin-bottom: 26px;
+    }
+  }
+
+  &__actions {
+    text-align: center;
+    margin-top: 50px;
+
+    .btn-view-more {
+      display: inline-block;
+      padding: 12px 28px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      border: 1px solid $color-border-light;
+      color: $color-text-main;
+      text-decoration: none;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background: gray;
+      }
+    }
+  }
+}
+

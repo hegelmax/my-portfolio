@@ -1,0 +1,142 @@
+@use "../../styles" as *;
+
+/* ============================
+   PHILOSOPHY SECTION
+============================ */
+
+.philosophy {
+  width: 100%;
+  background: $color-bg-page;
+  padding: 120px 0;
+
+  .philosophy__inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 40px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 60px;
+  }
+
+  /* TEXT SIDE */
+  .philosophy__text {
+    flex: 1 1 50%;
+    max-width: 560px;
+
+    .philosophy__title {
+      font-family: $font-serif;
+      color: $color-text-main;
+      font-size: 38px;
+      font-weight: 500;
+      margin-bottom: 26px;
+    }
+
+    .philosophy__lead {
+      font-family: $font-sans;
+      color: $color-text-muted;
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 22px;
+    }
+
+    .philosophy__link {
+      margin-top: 30px;
+      display: inline-block;
+
+      font-family: $font-sans;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: $color-text-main;
+
+      text-decoration: none;
+      border-bottom: 1px solid black;//rgba(black, 0.4);
+      padding-bottom: 3px;
+
+      transition: opacity 0.2s ease, border-color 0.2s ease;
+
+      &:hover {
+        opacity: 0.6;
+        border-color: black;//$black;
+      }
+    }
+  }
+
+  /* VISUAL SIDE */
+  .philosophy__visuals {
+    flex: 1 1 50%;
+
+    display: flex;
+	flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+
+    .philosophy__card {
+	  
+	  img {
+      	width: 360px;
+      	height: 260px;
+		border-radius: $radius-md;
+	  }
+
+      &:nth-child(2) {
+		margin-left: 50px;
+		img {
+			width: 420px;
+		}
+      }
+    }
+  }
+
+  /* ============================
+     RESPONSIVE
+  ============================= */
+
+  @media (max-width: 1300px) {
+    padding: 90px 0;
+
+    .philosophy__inner {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .philosophy__text {
+      max-width: 680px;
+    }
+
+    .philosophy__visuals {
+	  flex: 0 0 auto;
+      flex-direction: row; 
+	  justify-content: center;
+	  .philosophy__card img {
+		width: 420px;
+	  }
+    }
+  }
+
+  @media (max-width: 1100px) {
+    padding: 70px 0;
+
+    .philosophy__visuals {
+      flex-direction: column;
+      gap: 20px;
+
+      .philosophy__card {
+		img {
+          width: 340px;
+          height: 220px;
+		} 
+        &:nth-child(2) {
+		  margin-left: 0px;
+		  img {
+            width: 340px;
+		  }
+        }
+      }
+    }
+  }
+}
+

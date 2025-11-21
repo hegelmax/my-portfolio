@@ -1,0 +1,281 @@
+@use "../../styles" as *;
+
+/* ============================
+   HERO SECTION
+============================ */
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 80px;
+  padding-top: 80px;
+  background: $color-bg-page;
+
+  .h1,.h2 {
+    font-family: 'Playfair Display', serif;
+  }
+
+ /* ============================
+     Портрет (левая часть)
+  ============================= */
+  .left_part {
+    flex: 0 0 500px;
+    display: flex;
+    justify-content: center;
+    padding-right: 90px;
+  }
+
+  .left_in {
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    margin: 0 auto;
+
+    .layer {
+      will-change: transform;
+      transition: transform 0.1s linear;
+    }
+  }
+
+  .img_holder {
+    z-index: 10;
+    padding: 23px;
+    width: 100%;
+    position: static;
+  }
+
+  .left_part img {
+    display: block;
+    width: 100%;
+    height: auto;
+    opacity: 0; /* картинка служит только для пропорций */
+  }
+
+  /* Чёрная рамка */
+  .border {
+    position: absolute;
+    border: 7px solid $color-border-hero;
+    z-index: 5;
+  }
+
+  /* Жёлтый блок с точками */
+  .dots {
+    position: absolute;
+    background-color: $color-main;
+    top: 80px !important;
+    bottom: 80px !important;
+    left: -20px !important;
+    right: -20px !important;
+  }
+
+  /* Абсолютное реальное изображение */
+  .abs_img {
+    position: absolute;
+    inset: 30px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 10;
+  }
+
+  /* ============================
+     Правая часть (текст)
+  ============================= */
+  .right_part {
+    flex: 0 0 auto;
+  
+    .hero_title {
+      font-family: $font-serif;
+      color: $color-text-main;
+
+      /* маленький овертайтл PORTFOLIO */
+      &__kicker {
+        font-family: $font-header;
+        text-transform: uppercase;
+        color: $color-text-caption;
+        margin-bottom: 20px;
+        font-size:16px;
+        letter-spacing:4.8px;
+      }
+
+      h1 {
+        margin: 0 0 28px;
+        padding: 0;
+        font-size: 72px;
+        line-height: 1.05;
+        font-weight: 500;
+
+        span {
+          display: block;
+          font-family: $font-header;
+        }
+
+        /* вторая строка Designer — курсив + подчёркивание */
+        .hero_title__secondary {
+          font-style: italic;
+          position: relative;
+
+          &::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 100%;
+            height: 3px;
+            background: $color-text-main;
+          }
+        }
+      }
+
+      /* основной текст */
+      .hero_lead {
+        font-family: $font-ui;
+        font-size: 16px;
+        line-height: 1.7;
+        color: $color-text-caption;
+        margin: 0 0 30px;
+        max-width: 420px;
+      }
+
+      /* подпись */
+      img {
+        max-width: 190px;
+      }
+
+      /* кнопки */
+      .hero_actions {
+        margin: 40px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+    }
+  }
+
+  .hero-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    font-family: $font-sans;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-radius: $radius-pill;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+    &--primary {
+      background: $color-cta-bg;
+      border-color: $color-cta-bg;
+      color: $color-text-contrast;
+
+      &:hover {
+        background: $color-cta-hover-bg;
+        border-color: $color-cta-hover-bg;
+      }
+    }
+
+    &--ghost {
+      background: $color-bg-page;
+      border-color: $color-border-light;
+      color: $color-text-main;
+
+      &:hover {
+        background: $color-text-caption;
+      }
+    }
+  }
+
+  /* ============================
+     Адаптив
+  ============================= */
+
+  @media (max-width: 1300px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 60px;
+
+    .hero_title h1 {
+      font-size: 52px;
+    }
+  }
+
+  @media (max-width: 820px) {
+    //align-items: center;
+    //padding: 50px 0 60px;
+    //text-align: center;
+
+    .left_part {
+      padding-right: 0px;
+      width: 100%;
+    }
+
+    .left_part,
+    .right_part {
+      flex: 0 0 auto;
+    }
+
+    .right_part {
+      .hero_title {
+        &__kicker {
+          justify-content: center;
+        }
+
+        h1 {
+          font-size: 40px;
+          
+          span {
+            display: inline;
+          }
+
+          .hero_title__secondary {
+            margin-left: 10px;
+          }
+
+          .hero_title__secondary::after {
+            display: none;
+          }
+        }
+
+        h1::after {
+          display: block;
+          content: "";
+          position: relative;
+          left: 0;
+          bottom: -10px;
+          width: 100%;
+          height: 3px;
+          background: $color-text-main;
+        }
+
+        .hero_lead {
+          margin: 0 auto 24px;
+        }
+
+        .hero_actions {
+          justify-content: center;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    gap: 40px;
+
+    .left_in {
+      width: 290px;
+    }
+
+    .hero_title h1 {
+      font-size: 34px;
+    }
+
+    .hero_signature {
+      font-size: 24px;
+    }
+  }
+}
+

@@ -1,0 +1,13 @@
+DirectoryIndex index.php index.html
+
+RewriteEngine On
+RewriteBase /
+
+# === API routes (PHP backend) ===
+# RewriteRule ^api/(.*)$ /api/$1.php [L,NC]
+
+# === React SPA routing ===
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule .* /index.html [L]
+

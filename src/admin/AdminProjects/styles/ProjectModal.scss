@@ -1,0 +1,299 @@
+/* src/admin/AdminProjects/ProjectModal.scss */
+
+.projects-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(15, 23, 42, 0.85);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 24px;
+  overflow-y: auto;
+
+  .projects-modal {
+    width: 100%;
+    //max-width: 1320px;
+    background: #020617;
+    border-radius: 22px;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    box-shadow: 0 22px 60px rgba(15, 23, 42, 0.95);
+    padding: 22px 28px 20px;
+    box-sizing: border-box;
+
+    &__title {
+      margin: 0 0 14px;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    &__form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      width: 100%;
+    }
+
+    /* Общие поля */
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      span {
+        &::selection {
+          background: rgba(56, 189, 248, 0.3);
+        }
+      }
+
+      label > span:first-child {
+        font-size: 13px;
+        color: #cbd5f5;
+        margin-bottom: 2px;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        padding: 8px 10px;
+        font-size: 14px;
+        background: rgba(15, 23, 42, 0.8);
+        color: #e5e7eb;
+        outline: none;
+        min-height: 0;
+        resize: vertical;
+        box-sizing: border-box;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease,
+          background 0.15s ease;
+
+        &:focus {
+          border-color: #38bdf8;
+          box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
+          background: rgba(15, 23, 42, 0.95);
+        }
+
+        &::placeholder {
+          color: #6b7280;
+        }
+      }
+
+      &--inline {
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+
+        > * {
+          flex: 1;
+        }
+
+        label > span:first-child {
+          margin-bottom: 4px;
+        }
+      }
+    }
+
+    .field__label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+
+      > span:first-child {
+        font-size: 13px;
+        color: #cbd5f5;
+      }
+    }
+
+    .field__hint {
+      font-size: 11px;
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    .year-field {
+      max-width: 210px;
+    }
+
+    /* Тумблер Selected / featured */
+
+    .switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+
+      input {
+        display: none;
+      }
+
+      &__track {
+        width: 40px;
+        height: 22px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.6);
+        padding: 2px;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+        transition: background 0.15s ease;
+      }
+
+      &__thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        background: #020617;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
+        transform: translateX(0);
+        transition: transform 0.16s ease, background 0.16s ease;
+      }
+
+      &__label {
+        font-size: 13px;
+        color: #e5e7eb;
+      }
+
+      input:checked + .switch__track {
+        background: linear-gradient(135deg, #38bdf8, #22c55e);
+
+        .switch__thumb {
+          transform: translateX(16px);
+          background: #e5e7eb;
+        }
+      }
+    }
+
+    /* Трёхколоночная раскладка */
+
+    .project-form-layout {
+      display: grid;
+      grid-template-columns: 1.7fr 1.5fr 1.5fr;
+      gap: 22px;
+      width: 100%;
+
+      &__col {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+
+        &--left {
+          /* основные поля проекта */
+        }
+
+        &--center {
+          //max-height: 520px;
+          overflow-y: auto;
+          padding-right: 4px;
+        }
+
+        &--right {
+          max-height: 520px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+
+      @media (max-width: 1280px) {
+        grid-template-columns: 1.5fr 1.5fr;
+        grid-template-rows: auto auto;
+        grid-template-areas:
+          "left center"
+          "left right";
+
+        &__col--left {
+          grid-area: left;
+        }
+        &__col--center {
+          grid-area: center;
+        }
+        &__col--right {
+          grid-area: right;
+        }
+      }
+
+      @media (max-width: 960px) {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+          "left"
+          "center"
+          "right";
+
+        &__col--center,
+        &__col--right {
+          max-height: none;
+        }
+      }
+    }
+
+    .images-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .project-images-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      gap: 6px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    /* Глобальный футер под тремя колонками */
+
+    .project-form-footer {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(148, 163, 184, 0.35);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+
+      .btn-primary,
+      .btn-ghost {
+        border-radius: 999px;
+        padding-inline: 16px;
+      }
+    }
+  }
+}
+
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,0.6);
+  background: rgba(15,23,42,0.9);
+  color: #e5e7eb;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  span {
+    opacity: 0.7;
+    font-size: 10px;
+  }
+
+  &:hover {
+    background: rgba(15,23,42,1);
+    border-color: #38bdf8;
+  }
+}
+

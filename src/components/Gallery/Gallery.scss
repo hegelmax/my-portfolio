@@ -1,0 +1,300 @@
+@use "../../styles" as *;
+
+/* ===== Секция портфолио ===== */
+
+.np-portfolio {
+  width: 100%;
+  // padding-top: 80px; // при необходимости включишь
+  --np-grid-gap-y: 24px; // вертикальный отступ между рядами
+  --np-grid-gap-x: 24px; // суммарный горизонтальный зазор между колонками
+
+  /* Заголовок */
+  &__header {
+    margin-bottom: 30px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 28px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  &__subtitle {
+    margin: 8px 0 0;
+    max-width: 520px;
+    font-size: 14px;
+  }
+
+  /* ===== Фильтры (табы) ===== */
+
+  // обёртка — позиционирование даётся из JS через style
+  &__filters-wrap {
+    margin: 30px 0 25px;
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 15px;
+    background: $color-bg-page;
+    padding: 8px 0;
+  }
+
+  // спейсер под фиксированным блоком (высота задаётся inline-style)
+  &__filters-spacer {
+    // по умолчанию нулевая высота
+  }
+
+  &__filter {
+    position: relative;
+    border: none;
+    background-color: $color-filter-notactive;
+    padding: 10px 26px;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: $color-text-muted;
+
+    & + .np-portfolio__filter {
+      margin-left: 4px;
+    }
+
+    &--active {
+      background-color: $color-filter-active;
+      color: $color-bg-page;
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: -6px;
+        transform: translateX(-50%);
+        border-width: 6px 6px 0 6px;
+        border-style: solid;
+        border-color: $color-filter-active transparent transparent transparent;
+      }
+    }
+  }
+
+  /* ===== GRID Isotope (4 / 3 / 2 / 1 колонки) ===== */
+
+  &__grid {
+    position: relative;
+    // компенсируем внутренние паддинги колонок, чтобы края совпали
+    margin: 0 -12px;
+
+    // базовая ширина колонки
+    .grid-sizer,
+    .grid-item {
+      width: 25%;
+    }
+
+    .grid-item--w2 {
+      width: 50%;
+    }
+
+    /* Исходная плитка */
+    .grid-item {
+      float: left; // оставляем float — он нужен Isotope
+      box-sizing: border-box;
+      // горизонтальные отступы между столбцами + вертикальный
+      padding: 0 12px 24px;
+      cursor: zoom-in;
+    }
+
+    /* Адаптив */
+    @media (max-width: 1200px) {
+      .grid-sizer,
+      .grid-item {
+        width: 33.3333%;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .grid-sizer,
+      .grid-item {
+        width: 50%;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid-sizer,
+      .grid-item {
+        width: 100%;
+      }
+    }
+
+    /* чтобы контейнер очистил float’ы */
+    &::after {
+      content: "";
+      display: block;
+      clear: both;
+    }
+  }
+
+  /* Внутри — контейнер фиксированных пропорций */
+
+  &__item-inner {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* Пропорции карточек */
+
+  .ratio-1x1 &__item-inner::before,
+  .ratio-1x2 &__item-inner::before,
+  .ratio-2x1 &__item-inner::before,
+  .ratio-2x2 &__item-inner::before {
+    content: "";
+    display: block;
+  }
+
+  .ratio-1x1 &__item-inner::before {
+    padding-bottom: 100%;
+  }
+
+  // широкая плитка: 2 колонки по ширине, высота как у квадрата
+  .ratio-1x2 &__item-inner::before {
+    padding-bottom: calc(50% - var(--np-grid-gap-x) / 4);
+  }
+
+  // вертикальный 2:1 (1 колонка, 2 ряда)
+  .ratio-2x1 &__item-inner::before,
+  .ratio-2x2 &__item-inner::before {
+    padding-bottom: calc(200% + var(--np-grid-gap-y));
+  }
+
+  /* Картинка заполняет контейнер */
+
+  &__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  /* Overlay */
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: $color-overlay-0;
+    color: $color-bg-page;
+    opacity: 0;
+    display: flex;
+    align-items: flex-end;
+    transition:
+      opacity 0.2s ease,
+      background 0.2s ease;
+    padding: 16px 18px;
+
+    &-content {
+      h3 {
+        margin: 0 0 6px;
+        font-size: 14px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: 11px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+    }
+  }
+
+  &__item:hover {
+    .np-portfolio__overlay {
+      opacity: 1;
+      background: $color-overlay-55;
+    }
+
+    .np-portfolio__img {
+      transform: scale(1.03);
+    }
+  }
+
+  /* ===== Лайтбокс ===== */
+
+  &__lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $color-backdrop-80;
+  }
+
+  &__lightbox-inner {
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__lightbox-img {
+    max-width: 90vw;
+    max-height: 80vh;
+    object-fit: contain;
+  }
+
+  &__lightbox-caption {
+    margin-top: 12px;
+    text-align: center;
+    color: $color-bg-page;
+  }
+
+  /* Крестик – в верхнем правом углу окна, а не картинки */
+  &__lightbox-close {
+    position: fixed;
+    top: 20px;
+    right: 28px;
+    z-index: 10000;
+    font-size: 28px;
+    line-height: 1;
+    color: $color-bg-page;
+    background: $color-backdrop-60;
+    border: none;
+    border-radius: 999px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+
+  /* Стрелки – по бокам экрана, не поверх картинки */
+  &__lightbox-nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10000;
+    font-size: 32px;
+    line-height: 1;
+    color: $color-bg-page;
+    background: $color-backdrop-60;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 14px;
+    cursor: pointer;
+
+    &--prev {
+      left: 24px;
+    }
+
+    &--next {
+      right: 24px;
+    }
+  }
+}
+

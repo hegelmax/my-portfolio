@@ -1,0 +1,17 @@
+@use "../../styles" as *;
+
+.projects-page {
+  background: $color-bg-page;
+
+  &__header {
+    max-width: 1350px;
+    margin: 0 auto 60px;
+    padding: 0 40px;
+
+    h1 {
+      font-family: $font-serif;
+      font-size: 48px;
+    }
+  }
+}
+

@@ -1,0 +1,105 @@
+.projects-modal-backdrop {
+  .projects-modal.img-picker-modal {
+    //max-width: 900px;
+
+    .img-picker-layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 16px;
+      margin-top: 4px;
+
+      &__col {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+
+    .img-picker-section-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #9ca3af;
+    }
+
+    .img-tree {
+      list-style: none;
+      margin: 0;
+      padding-left: 0;
+      max-height: 260px;
+      overflow: auto;
+      font-size: 13px;
+
+      &__node {
+        margin: 2px 0;
+      }
+
+      &__children {
+        list-style: none;
+        margin: 2px 0 2px 16px;
+        padding: 0;
+      }
+
+      &__label {
+        margin-left: 4px;
+      }
+
+      &__badge {
+        margin-left: 6px;
+        font-size: 11px;
+        opacity: 0.8;
+      }
+    }
+
+    .img-picker-load-btn {
+      margin-top: 4px;
+    }
+
+    .img-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 8px;
+      //max-height: 260px;
+      overflow: auto;
+
+      &__item {
+        position: relative;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        padding: 0;
+        background: transparent;
+        cursor: pointer;
+
+        &--selected {
+          border-color: #38bdf8;
+          box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+
+          &::after {
+            content: "✓";
+            position: absolute;
+            right: 6px;
+            top: 4px;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.9);
+            color: #e5e7eb;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+      }
+
+      &__thumb {
+        display: block;
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+    }
+  }
+}
+

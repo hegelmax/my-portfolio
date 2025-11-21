@@ -1,0 +1,204 @@
+/* ===== Dashboard ===== */
+
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.admin-dashboard__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.admin-dashboard__title {
+  font-size: 22px;
+  margin: 0 0 4px;
+}
+
+.admin-dashboard__subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.admin-dashboard__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-dashboard__loading,
+.admin-dashboard__error {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.admin-dashboard__loading {
+  background: rgba(148, 163, 184, 0.12);
+  color: #e5e7eb;
+}
+
+.admin-dashboard__error {
+  background: rgba(248, 113, 113, 0.1);
+  color: #fecaca;
+  border: 1px solid rgba(248, 113, 113, 0.6);
+}
+
+/* Верхние метрики */
+.admin-dashboard__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  @media (max-width: 960px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.metric-card {
+  border-radius: 16px;
+  padding: 16px 18px;
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
+              #020617;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.6);
+}
+
+.metric-card__label {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.metric-card__value {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.metric-card__hint {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 6px;
+
+  code {
+    font-size: 11px;
+    background: rgba(15, 23, 42, 0.9);
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+}
+
+/* Нижняя сетка */
+.admin-dashboard__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 16px;
+
+  @media (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.panel {
+  border-radius: 16px;
+  padding: 16px 18px 18px;
+  background: #020617;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.panel__header {
+  margin-bottom: 12px;
+}
+
+.panel__title {
+  font-size: 16px;
+  margin: 0 0 4px;
+}
+
+.panel__subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.panel__empty {
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.panel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-top: 4px;
+
+  th,
+  td {
+    padding: 6px 4px;
+  }
+
+  thead th {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #9ca3af;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+  }
+
+  tbody tr:nth-child(even) {
+    background: rgba(15, 23, 42, 0.65);
+  }
+}
+
+.panel-list {
+  margin: 4px 0 0;
+  padding-left: 16px;
+  font-size: 14px;
+  color: #e5e7eb;
+
+  li + li {
+    margin-top: 6px;
+  }
+
+  code {
+    font-size: 11px;
+    background: rgba(15, 23, 42, 0.9);
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+}
+
+/* Кнопки (используются в header) */
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #e5e7eb;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background: #e5e7eb;
+    color: #020617;
+    border-color: transparent;
+  }
+}
+

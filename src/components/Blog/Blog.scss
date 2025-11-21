@@ -1,0 +1,123 @@
+@use "../../styles" as *;
+
+.page--blog {
+  padding-top: 80px;
+  padding-bottom: 120px;
+  background: $color-bg-page;
+
+  .blog-header {
+    margin-bottom: 40px;
+
+    &__title {
+      font-size: 42px;
+      font-family: $font-serif;
+      margin-bottom: 8px;
+    }
+
+    &__intro {
+      font-size: 16px;
+      color: $color-text-muted;
+      line-height: 1.7;
+    }
+  }
+
+  .blog-list {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+  }
+
+  .blog-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    &__image {
+      img {
+        width: 100%;
+        display: block;
+        border-radius: $radius-sm;
+        object-fit: cover;
+      }
+    }
+
+    &__content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    &__title {
+      font-size: 26px;
+      margin: 18px 0 4px;
+    }
+
+    &__meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: $color-text-caption;
+      margin-bottom: 12px;
+    }
+
+    &__separator {
+      margin: 0 6px;
+    }
+
+    &__intro {
+      font-size: 16px;
+      line-height: 1.7;
+      color: $color-text-muted;
+      margin-bottom: 14px;
+    }
+
+    &__readmore {
+      font-size: 15px;
+      color: $color-accent;
+      text-decoration: none;
+      border-bottom: 1px solid $color-accent-soft-04;
+      padding-bottom: 1px;
+      transition: opacity 0.2s ease, border-color 0.2s ease;
+
+      &:hover {
+        opacity: 0.7;
+        border-color: $color-accent-soft-07;
+      }
+    }
+  }
+
+  .blog-pagination {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+
+    &__btn,
+    &__page {
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      cursor: pointer;
+      color: $color-text-muted;
+      padding: 4px 8px;
+    }
+
+    &__page--active {
+      color: $color-text-main;
+      font-weight: 600;
+      border-bottom: 1px solid $color-text-main;
+    }
+
+    &__btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+  }
+}
+
