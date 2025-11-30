@@ -32,7 +32,7 @@ export const GalleriesProvider: React.FC<React.PropsWithChildren> = ({
     try {
       setLoading(true);
       setError(null);
-      const resp = await fetch("/api/admin/galleries/list.php");
+      const resp = await fetch("/data/galleries.json");
       if (!resp.ok) {
         throw new Error("Failed to load galleries");
       }

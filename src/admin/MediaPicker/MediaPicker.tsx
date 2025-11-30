@@ -60,6 +60,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [selectedPaths, setSelectedPaths] = useState<string[]>([]);
@@ -252,6 +253,36 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
     if (!canUseSelection || selectedPaths.length === 0) return;
     onSelect?.(selectedPaths);
     onClose();
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedPaths.length === 0 || deleting) return;
+    const confirmed = window.confirm(
+      `Delete ${selectedPaths.length} file${selectedPaths.length > 1 ? "s" : ""}?`,
+    );
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+      setBulkStatus(null);
+      const resp = await fetch("/api/admin/media/delete.php", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paths: selectedPaths }),
+      });
+      const data = await resp.json();
+      if (!data.success) {
+        throw new Error(data.error || "Delete failed");
+      }
+      setSelectedPaths([]);
+      setBulkStatus(`Deleted ${selectedPaths.length} file(s)`);
+      await load();
+    } catch (e: any) {
+      setError(e?.message || "Delete failed");
+    } finally {
+      setDeleting(false);
+    }
   };
 
 
@@ -526,6 +557,14 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
           disabled={selectedPaths.length === 0}
         >
           Clear selection
+        </button>
+        <button
+          type="button"
+          className="media-picker__btn media-picker__btn--danger"
+          onClick={handleDeleteSelected}
+          disabled={selectedPaths.length === 0 || deleting}
+        >
+          {deleting ? "Deleting..." : "Delete selected"}
         </button>
       </div>
       <div className="media-picker__toolbar-right">

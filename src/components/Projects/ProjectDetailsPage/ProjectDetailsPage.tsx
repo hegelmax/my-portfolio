@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import "./ProjectDetailsPage.scss";
 
@@ -31,6 +32,8 @@ export default function ProjectDetailsPage() {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const thumbsRef = useRef<HTMLDivElement | null>(null);
+  const lightboxWheelTs = useRef(0);
 
   // грузим проекты и находим нужный по slug
   useEffect(() => {
@@ -103,6 +106,30 @@ export default function ProjectDetailsPage() {
     setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
+  const handleThumbWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (!thumbsRef.current) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    thumbsRef.current.scrollLeft += delta;
+  };
+
+  const handleLightboxWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const now = Date.now();
+    if (now - lightboxWheelTs.current < 200) return; // simple throttle
+    lightboxWheelTs.current = now;
+
+    const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    if (delta > 0) {
+      showNext();
+    } else if (delta < 0) {
+      showPrev();
+    }
+  };
+
   // управление стрелками и Esc — хук ВСЕГДА вызывается, но внутри есть guard
   useEffect(() => {
     if (!isLightboxOpen || !images.length) return;
@@ -116,6 +143,15 @@ export default function ProjectDetailsPage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [isLightboxOpen, images.length]);
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isLightboxOpen]);
 
   // fallback, если проект не найден
   if (!project) {
@@ -165,8 +201,12 @@ export default function ProjectDetailsPage() {
             </div>
 
             {/* Лента превью */}
-            {images.length > 1 && (
-              <div className="project-page__thumbs">
+              {images.length > 1 && (
+              <div
+                className="project-page__thumbs"
+                ref={thumbsRef}
+                onWheelCapture={handleThumbWheel}
+              >
                 {images.map((src, idx) => (
                   <button
                     type="button"
@@ -288,48 +328,55 @@ export default function ProjectDetailsPage() {
             </div>
           </section>
         )}
-        {isLightboxOpen && (
-          <div className="project-page__lightbox" onClick={closeLightbox}>
+        {isLightboxOpen &&
+          createPortal(
             <div
-              className="project-page__lightbox-inner"
-              onClick={(e) => e.stopPropagation()}
+              className="project-page__lightbox"
+              onClick={closeLightbox}
+              onWheelCapture={handleLightboxWheel}
             >
-              <button
-                className="project-page__lightbox-close"
-                onClick={closeLightbox}
-                aria-label="Close"
+              <div
+                className="project-page__lightbox-inner"
+                onClick={(e) => e.stopPropagation()}
               >
-                ×
-              </button>
+                <button
+                  className="project-page__lightbox-close"
+                  onClick={closeLightbox}
+                  aria-label="Close"
+                >
+                  ×
+                </button>
 
-              {images.length > 1 && (
-                <>
-                  <button
-                    className="project-page__lightbox-nav project-page__lightbox-nav--prev"
-                    onClick={showPrev}
-                    aria-label="Previous image"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    className="project-page__lightbox-nav project-page__lightbox-nav--next"
-                    onClick={showNext}
-                    aria-label="Next image"
-                  >
-                    ›
-                  </button>
-                </>
-              )}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      className="project-page__lightbox-nav project-page__lightbox-nav--prev"
+                      onClick={showPrev}
+                      aria-label="Previous image"
+                    >
+                      {"<"}
+                    </button>
+                    <button
+                      className="project-page__lightbox-nav project-page__lightbox-nav--next"
+                      onClick={showNext}
+                      aria-label="Next image"
+                    >
+                      {">"}
+                    </button>
+                  </>
+                )}
 
-              <img
-                src={images[activeIndex]}
-                alt={`${project.title} large ${activeIndex + 1}`}
-                className="project-page__lightbox-img"
-              />
-            </div>
-          </div>
-        )}
+                <img
+                  src={images[activeIndex]}
+                  alt={`${project.title} large ${activeIndex + 1}`}
+                  className="project-page__lightbox-img"
+                />
+              </div>
+            </div>,
+            document.body
+          )}
       </div>
     </section>
   );
 }
+

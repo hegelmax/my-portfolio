@@ -9,15 +9,7 @@ const loadMedia = async () => {
     return mediaCache;
   }
   if (!mediaPromise) {
-    mediaPromise = fetch("/api/admin/media/list", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        page: 1,
-        pageSize: 5000,
-      }),
-    })
+    mediaPromise = fetch("/data/media.json")
       .then((resp) => {
         if (!resp.ok) {
           throw new Error("Failed to load media");
@@ -25,7 +17,7 @@ const loadMedia = async () => {
         return resp.json();
       })
       .then((data) => {
-        const items = Array.isArray(data.items) ? data.items : [];
+        const items = Array.isArray(data) ? data : [];
         mediaCache = items;
         mediaPromise = null;
         return items;

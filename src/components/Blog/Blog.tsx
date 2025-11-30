@@ -32,7 +32,7 @@ const Blog: React.FC = () => {
     const fetchBlog = async () => {
       setLoading(true);
       try {
-        const resp = await fetch(`https://paley.hgl.mx/api/blog/?page=${page}&limit=${pageSize}`);
+        const resp = await fetch(`/api/blog/?page=${page}&limit=${pageSize}`);
         const json = await resp.json();
         setData(json);
       } catch (e) {
