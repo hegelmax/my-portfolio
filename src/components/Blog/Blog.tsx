@@ -32,7 +32,7 @@ const Blog: React.FC = () => {
     const fetchBlog = async () => {
       setLoading(true);
       try {
-        const resp = await fetch(`/api/blog/?page=${page}&limit=${pageSize}`);
+        const resp = await fetch(`/api/blog/get?page=${page}&limit=${pageSize}`);
         const json = await resp.json();
         setData(json);
       } catch (e) {
@@ -94,15 +94,18 @@ const Blog: React.FC = () => {
                     <a
                       href={`https://renew.style/blog/${item.id}-${item.slug}`}
                       className="blog-card__readmore"
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Read more on renew.style (opens in a new tab)"
                     >
-                      Read More
+                      Read More <i className="nav-external-icon ri-external-link-line" aria-hidden="true" />
                     </a>
                   </div>
                 </article>
               ))}
             </section>
 
-            {/* Пагинация */}
+          {/* Pagination */}
             {data.totalPages > 1 && (
               <nav className="blog-pagination">
                 <button

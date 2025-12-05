@@ -9,7 +9,7 @@ type ImageInfo = {
 type ImagePickerModalProps = {
   onClose: () => void;
   onApply: (images: ImageInfo[]) => void;
-  initialSelected?: string[]; // список url уже выбранных картинок
+  initialSelected?: string[]; // list of already selected image URLs
 };
 
 type FolderNode = {

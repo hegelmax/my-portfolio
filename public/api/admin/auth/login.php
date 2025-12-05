@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/_init.php';
 
 header('Content-Type: application/json; charset=utf-8');
@@ -15,10 +16,13 @@ $login    = trim($input['name'] ?? '');
 $password = $input['password'] ?? '';
 
 if (!admin_verify_credentials($login, $password)) {
-    echo json_encode(['success' => false, 'errors' => ['Неверный логин или пароль']], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['success' => false, 'errors' => ['Invalid login or password']], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-admin_login($login);
+$user = admin_find_user($login) ?? [];
+$role = $user['role'] ?? 'admin';
+
+admin_login($login, $role);
 
 echo json_encode(['success' => true], JSON_UNESCAPED_UNICODE);

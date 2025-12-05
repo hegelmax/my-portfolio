@@ -17,7 +17,7 @@ export function useRequireAdminAuth() {
 
         if (cancelled) return;
 
-        // если админ не настроен или не залогинен — на страницу логина / setup
+        // If admin is not set up or not authenticated - redirect to login/setup
         if (!data.isAuthenticated || data.firstRun) {
           navigate("/admin", { replace: true });
         } else {
@@ -25,7 +25,7 @@ export function useRequireAdminAuth() {
         }
       } catch {
         if (!cancelled) {
-          // если не смогли проверить — тоже выкидываем на логин
+          // If check failed - redirect to login as well
           navigate("/admin", { replace: true });
         }
       }

@@ -10,7 +10,7 @@ export default function HeroSection() {
     const scene = sceneRef.current;
     if (!scene) return;
 
-    // только на десктопе, чтобы не дёргать мобилу
+    // desktop only to avoid heavy work on mobile
     if (window.innerWidth < 1024) return;
 
     const layers = Array.from(
@@ -22,7 +22,7 @@ export default function HeroSection() {
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
 
-      // нормализованные координаты от -1 до 1
+      // normalized coordinates from -1 to 1
       const relX = (e.clientX - centerX) / rect.width;
       const relY = (e.clientY - centerY) / rect.height;
 
@@ -30,7 +30,7 @@ export default function HeroSection() {
         const depthAttr = layer.getAttribute("data-depth") || "0";
         const depth = parseFloat(depthAttr);
 
-        // коэффициент можно подправить (20–40)
+        // tweak coefficient if needed (20-40)
         const moveX = -relX * depth * 40;
         const moveY = -relY * depth * 40;
 
@@ -42,7 +42,7 @@ export default function HeroSection() {
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      // на unmount вернём слои в ноль
+      // reset layers on unmount
       layers.forEach((layer) => {
         layer.style.transform = "translate3d(0, 0, 0)";
       });
@@ -83,7 +83,11 @@ export default function HeroSection() {
           silhouettes.
         </p>
 
-        <img src="/img/home/paley-sign-small.png" alt="Nadia Paley" />
+        <img
+          className="hero_signature"
+          src="/img/home/paley-sign-small.png"
+          alt="Nadia Paley"
+        />
 
         <div className="hero_actions">
           <NavLink to="/projects"><button className="hero-btn hero-btn--primary">View Projects</button></NavLink>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useGalleries } from "../../context/GalleriesContext";
 import { buildFilterRoute } from "../../utils/galleryFilters";
+import { usePdfWorksMeta } from "../../hooks/usePdfWorksMeta";
 
 import "./MobileHeader.scss";
 
@@ -9,6 +10,8 @@ export default function MobileHeader() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const { galleries } = useGalleries();
+  const { hasWorks, loading } = usePdfWorksMeta();
+  const showPdfWorks = !loading && hasWorks;
 
   useEffect(() => {
     setOpen(false);
@@ -46,6 +49,11 @@ export default function MobileHeader() {
           <li>
             <Link to="/projects" onClick={handleNavigate}>Projects</Link>
           </li>
+          {showPdfWorks && (
+            <li>
+              <Link to="/works/pdf" onClick={handleNavigate}>PDF works</Link>
+            </li>
+          )}
 
           {galleries
             .filter((gallery) => gallery.filters.some((filter) => filter.showInMenu))
@@ -75,8 +83,13 @@ export default function MobileHeader() {
             <Link to="/contact" onClick={handleNavigate}>Contact</Link>
           </li>
           <li>
-            <a target="_blank" href="https://cv.hgl.mx/nadia_hegel" rel="noreferrer">
-              CV
+            <a
+              target="_blank"
+              href="https://cv.paley.art"
+              rel="noreferrer"
+              aria-label="CV (opens in a new tab)"
+            >
+              CV <i className="nav-external-icon ri-external-link-line" aria-hidden="true" />
             </a>
           </li>
         </ul>

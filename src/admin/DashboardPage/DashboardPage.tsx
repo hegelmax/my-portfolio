@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRequireAdminAuth } from "../useRequireAdminAuth";
+import { fetchJsonCached } from "../../utils/fetchJsonCached";
 
 import "./DashboardPage.scss";
 
@@ -38,7 +39,7 @@ const DashboardPage: React.FC = () => {
   });
 
   useEffect(() => {
-    // пока не знаем, авторизован ли пользователь — не грузим данные
+    // while auth status is unknown, do not load data
     if (!authReady) return;
 
     let cancelled = false;
@@ -46,21 +47,16 @@ const DashboardPage: React.FC = () => {
     const load = async () => {
       try {
         const [projectsRes, portfolioRes, publicationsRes] = await Promise.all([
-          fetch("/data/projects.json"),
-          fetch("/data/portfolio-items.json"),
-          fetch("/data/publications-items.json"),
+          fetchJsonCached("/data/projects.json"),
+          fetchJsonCached("/data/portfolio-items.json"),
+          fetchJsonCached("/data/publications-items.json"),
         ]);
 
-        if (!projectsRes.ok || !portfolioRes.ok || !publicationsRes.ok) {
-          throw new Error("Failed to load JSON data");
-        }
-
-        const [projectsJson, portfolioJson, publicationsJson] =
-          await Promise.all([
-            projectsRes.json(),
-            portfolioRes.json(),
-            publicationsRes.json(),
-          ]);
+        const [projectsJson, portfolioJson, publicationsJson] = [
+          projectsRes,
+          portfolioRes,
+          publicationsRes,
+        ];
 
         if (cancelled) return;
 
@@ -92,7 +88,7 @@ const DashboardPage: React.FC = () => {
     };
   }, [authReady]);
 
-  // все хуки уже вызваны — теперь можно условно рендерить
+  // all hooks already called - can conditionally render now
   if (!authReady) {
     return (
       <div className="admin-dashboard">
@@ -129,7 +125,7 @@ const DashboardPage: React.FC = () => {
         <div>
           <h1 className="admin-dashboard__title">Overview</h1>
           <p className="admin-dashboard__subtitle">
-            Быстрый обзор проектов, портфолио и публикаций.
+            Quick overview of projects, portfolio, and publications.
           </p>
         </div>
         <div className="admin-dashboard__actions">
@@ -190,13 +186,12 @@ const DashboardPage: React.FC = () => {
               <div className="panel__header">
                 <h2 className="panel__title">Projects by category</h2>
                 <p className="panel__subtitle">
-                  Распределение проектов по категориям (например:
-                  collection, editorial…)
+                  Distribution of projects by category (e.g., collection, editorial)
                 </p>
               </div>
               {categoryEntries.length === 0 ? (
                 <div className="panel__empty">
-                  Нет проектов в projects.json
+                  No projects in projects.json
                 </div>
               ) : (
                 <table className="panel-table">
@@ -222,28 +217,26 @@ const DashboardPage: React.FC = () => {
               <div className="panel__header">
                 <h2 className="panel__title">Quick notes</h2>
                 <p className="panel__subtitle">
-                  Черновые подсказки по следующему этапу настройки админки.
+                  Draft notes for the next admin setup steps.
                 </p>
               </div>
               <ul className="panel-list">
                 <li>
-                  <strong>Projects</strong> — будут редактироваться на
-                  отдельной странице: текст, обложка, галерея и связанные
-                  проекты.
+                  <strong>Projects</strong> - will be edited on a dedicated page: text, cover, gallery, and related projects.
                 </li>
                 <li>
-                  <strong>Portfolio gallery</strong> — будет собираться из
-                  выбранных папок <code>/img/…</code> с превью фотографий и
-                  форматами (1:1, 2:1 и т.д.).
+                  <strong>Portfolio gallery</strong> — will be built from
+                  selected folders <code>/img/…</code> with photo previews and
+                  formats (1:1, 2:1, etc.).
                 </li>
                 <li>
-                  <strong>Publications gallery</strong> — отдельный набор
-                  карточек для celebrities / covers.
+                  <strong>Publications gallery</strong> — separate set of
+                  cards for celebrities / covers.
                 </li>
                 <li>
-                  Следующий шаг — сделать страницу{" "}
-                  <code>/admin/projects</code> с таблицей/карточками
-                  проектов и модалкой выбора фотографий.
+                  Next step - build{" "}
+                  <code>/admin/projects</code> with table/cards
+                  of projects and a photo picker modal.
                 </li>
               </ul>
             </article>
@@ -255,3 +248,6 @@ const DashboardPage: React.FC = () => {
 };
 
 export default DashboardPage;
+
+
+

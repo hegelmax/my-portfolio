@@ -1,6 +1,6 @@
 @use "../../styles" as *;
 
-/* Desktop: мобильный header скрыт */
+/* Desktop: mobile header hidden */
 #mobile-header {
   display: none;
 }
@@ -12,8 +12,8 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: $color-bg-page;
-    border-bottom: 1px solid $color-border-light;
+    background: var(--color-bg-body);
+    border-bottom: 1px solid var(--color-border-light);
     margin-bottom: 20px;
 
     .mobile-header-inner {
@@ -34,7 +34,7 @@
       }
     }
 
-    /* Кнопка-бургер */
+    /* Burger button */
     .burger {
       width: 32px;
       height: 24px;
@@ -50,7 +50,7 @@
         display: block;
         height: 2px;
         width: 100%;
-        background: $color-text-main;
+        background: var(--color-text-main);
         transition: transform 0.2s ease, opacity 0.2s ease;
       }
 
@@ -69,7 +69,7 @@
       }
     }
 
-    /* Мобильное меню */
+    /* Mobile menu */
     .mobile-nav {
       max-height: 0;
       overflow: hidden;
@@ -77,7 +77,7 @@
       padding: 0 15px;
 
       &.is-open {
-        max-height: 500px; /* достаточно, чтобы влез весь список */
+        max-height: 600px; /* enough height to fit the whole list */
       }
 
       ul {
@@ -95,11 +95,18 @@
         display: inline-block;
         padding: 4px 0;
         font-size: 14px;
-        color: $color-text-main;
+        color: var(--color-text-main);
         border: none;
+
+        .nav-external-icon {
+          display: inline-block;
+          font-size: 13px;
+          margin-left: 4px;
+          vertical-align: text-top;
+        }
       }
 
-      /* Подменю */
+      /* Submenu */
       li.dropdown {
         > span::after {
           content: " +";

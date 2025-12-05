@@ -35,4 +35,11 @@ export interface MediaLibraryItem {
   tags?: string[];
   width?: number;
   height?: number;
+  alt?: string;
+  credit?: string;
+  format?: "1:1" | "1:2" | "2:1" | "2:2";
+  focusX?: number;
+  focusY?: number;
+  fit?: "cover" | "contain";
+  rotation?: number;
 }

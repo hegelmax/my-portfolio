@@ -22,8 +22,13 @@ const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
   const wheelLastTimeRef = useRef<number>(0);
 
   if (!currentItem) return null;
+  const focusX = currentItem.focusX ?? 50;
+  const focusY = currentItem.focusY ?? 50;
+  const fit = currentItem.fit === "contain" ? "contain" : "cover";
+  const rotation =
+    typeof currentItem.rotation === "number" ? ((currentItem.rotation % 360) + 360) % 360 : 0;
 
-  // Блокируем scroll body, пока открыт лайтбокс
+  // Block body scroll while lightbox is open
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -32,7 +37,7 @@ const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
     };
   }, []);
 
-  // ESC и стрелки клавиатуры
+  // ESC and arrow keys
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -43,7 +48,7 @@ const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
     return () => window.removeEventListener("keydown", handler);
   }, [onClose, onPrev, onNext]);
 
-  // Свайп на мобильном
+  // Swipe on mobile
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartXRef.current = e.touches[0].clientX;
   };
@@ -66,7 +71,7 @@ const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
     touchStartXRef.current = null;
   };
 
-  // Листание колесиком
+  // Scroll wheel navigation
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -142,6 +147,11 @@ const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
           src={currentItem.image}
           alt={currentItem.title}
           className="np-portfolio__lightbox-img"
+          style={{
+            objectFit: fit,
+            objectPosition: `${focusX}% ${focusY}%`,
+            transform: rotation ? `rotate(${rotation}deg)` : undefined,
+          }}
         />
         <div className="np-portfolio__lightbox-caption">
           <h3>{currentItem.title}</h3>

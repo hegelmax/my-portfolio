@@ -7,10 +7,17 @@
 #sidebar {
   width: 25%;
   max-width: 150px;
-  overflow: hidden;
+  overflow: visible;
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
+  transition: padding 0.3s ease;
 
   .sidebar-inner {
     padding-right: 30px;
+    position: relative;
+    padding-top: 20px;
+    transition: padding 0.3s ease;
   }
 
   .logo {
@@ -18,11 +25,35 @@
     margin-bottom: 30px;
     padding: 0;
     border: none;
+    transition: transform 0.25s ease, margin 0.25s ease;
 
     img {
       display: block;
       width: 50px;
       height: auto;
+      transition: transform 0.25s ease, width 0.25s ease;
+    }
+  }
+
+  &.is-sticky {
+    top: 10px;
+
+    .sidebar-inner {
+      padding-top: 10px;
+
+    }
+
+    nav {
+      padding: 10px 0px 10px;
+    }
+
+    .logo {
+      margin-bottom: 0px;
+
+      img {
+        width: 40px;
+        transform: translateY(-2px);
+      }
     }
   }
 
@@ -32,7 +63,7 @@
 
   nav {
     padding: 25px 0 10px;
-    color: $color-text-main;
+    color: var(--color-text-main);
 
     ul {
       list-style: none;
@@ -40,28 +71,35 @@
       padding: 0;
 
       li {
-        /* Базовые ссылки */
+        /* Base links */
         a,
         span {
           display: inline-block;
           padding: 6px 0;
-          color: $color-text-main;
+          color: var(--color-text-main);
           text-decoration: none;
           border: none;
           font-weight: 300;
           transition: color 100ms;
 
           &.current {
-            color: $color-accent;
+            color: var(--color-accent);
           }
 
           &:hover {
-            color: $color-accent;
+            color: var(--color-accent);
             cursor: pointer;
 
             &::before {
-              background-color: $color-accent;
+              background-color: var(--color-accent);
             }
+          }
+
+          .nav-external-icon {
+            display: inline-block;
+            font-size: 13px;
+            margin-left: 4px;
+            vertical-align: text-top;
           }
         }
 
@@ -73,7 +111,7 @@
           span {
             position: relative;
 
-            /* плюс/крестик */
+            /* Plus / cross icon */
             &::after,
             &::before {
               content: '';
@@ -85,7 +123,7 @@
               display: inline-block;
               width: 7px;
               height: 1px;
-              background-color: $color-text-main;
+              background-color: var(--color-text-main);
               transition: background-color 100ms, transform 200ms;
             }
 
@@ -99,11 +137,11 @@
             &.current::before,
             &:hover::after,
             &:hover::before {
-              background-color: $color-accent;
+              background-color: var(--color-accent);
             }
           }
 
-          /* скрытое подменю */
+          /* Hidden submenu */
           ul {
             display: none;
 
@@ -118,7 +156,7 @@
                   display: inline-block;
                   width: 4px;
                   height: 1px;
-                  background-color: $color-text-main;
+                  background-color: var(--color-text-main);
                   margin-bottom: 4px;
                   margin-right: 6px;
                   transition: background-color 100ms;
@@ -126,13 +164,13 @@
 
                 &.current::before,
                 &:hover::before {
-                  background-color: $color-accent;
+                  background-color: var(--color-accent);
                 }
               }
             }
           }
 
-          /* раскрытое подменю */
+          /* Expanded submenu */
           &.expanded {
             span::before {
               transform: rotate(90deg);
@@ -146,7 +184,7 @@
                 opacity: 1;
               }
 
-              /* Плавная задержка для каждого пункта */
+              /* Staggered delay for each item */
               @for $i from 1 through 10 {
                 li:nth-child(#{$i}) {
                   transition:
@@ -167,7 +205,7 @@
 
   .copyright {
     padding-top: 20px;
-    color: $color-text-caption;
+    color: var(--color-text-caption);
     font-size: 13px;
   }
 
@@ -189,7 +227,7 @@
     }
 
     .intro {
-      border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+      border-bottom: 1px dashed var(--color-border-input);
       padding-bottom: 20px;
     }
 
@@ -208,9 +246,9 @@
             ul {
               position: absolute;
               margin-top: 5px;
-              background-color: $color-bg-page;
+              background-color: var(--color-bg-body);
               padding: 0 15px;
-              box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.035);
+              box-shadow: 0 0 10px 5px var(--shadow-subtle);
               text-align: left;
               z-index: 10;
 

@@ -17,7 +17,7 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // >>> Вот реализация TODO: определяем режим по /api/admin/state.php
+  // determine mode via /api/admin/state
   useEffect(() => {
     let cancelled = false;
 
@@ -36,7 +36,7 @@ const LoginPage: React.FC = () => {
         }
       } catch (e) {
         if (!cancelled) {
-          // если что-то пошло не так — считаем, что админ уже есть
+          // if check fails, assume admin already exists
           setMode("login");
           //setInitialized(true);
         }
@@ -49,7 +49,6 @@ const LoginPage: React.FC = () => {
       cancelled = true;
     };
   }, []);
-  // <<< конец TODO
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +63,7 @@ const LoginPage: React.FC = () => {
       setLoading(true);
 
       if (mode === "setup") {
-        // первый вход — создаём админа, PHP сохранит хэш в конфиге
+        // first-time setup - create admin, PHP will store hash in config
         const resp = await fetch("/api/admin/auth/setup", {
           method: "POST",
           credentials: "include",
@@ -73,7 +72,7 @@ const LoginPage: React.FC = () => {
         });
         if (!resp.ok) throw new Error("Setup failed");
       } else {
-        // обычный логин
+        // regular login
         const resp = await fetch("/api/admin/auth/login", {
           method: "POST",
           credentials: "include",
@@ -83,7 +82,7 @@ const LoginPage: React.FC = () => {
         if (!resp.ok) throw new Error("Invalid credentials");
       }
 
-      // если всё ок — летим в дашборд
+      // if ok — go to dashboard
       navigate("/admin/dashboard");
     } catch (err: any) {
       setError(err.message || "Something went wrong");

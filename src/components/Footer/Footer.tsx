@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
     <footer className="footer">
       <div className="footer__inner">
 
-        {/* ЛОГОКартинка вместо монограммы */}
+        {/* Logo image instead of monogram */}
         <div className="footer__logo">
           <img
             src="/img/np.png"
@@ -19,7 +19,7 @@ const Footer: React.FC = () => {
           />
         </div>
 
-        {/* Соцсети */}
+        {/* Social links */}
         <div className="footer__social">
           <a href="https://www.instagram.com/nadiapaley/" target="_blank" rel="noopener noreferrer">
             <i className="footer__icon ri-instagram-line"></i>
@@ -32,7 +32,7 @@ const Footer: React.FC = () => {
           </Link>
         </div>
 
-        {/* Копирайт */}
+        {/* Copyright */}
         <div className="footer__copy">
           <p>© {new Date().getFullYear()} Nadia Paley</p>
           <p>

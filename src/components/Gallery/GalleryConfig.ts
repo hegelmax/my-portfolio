@@ -11,6 +11,10 @@ export interface GalleryItem {
   categories?: Category[];
   tags: string[];
   format: "1:1" | "1:2" | "2:1" | "2:2";
+  focusX?: number;
+  focusY?: number;
+  fit?: "cover" | "contain";
+  rotation?: number;
 }
 
 export interface GalleryConfigShape {
@@ -59,7 +63,7 @@ export const formatClass = (format: GalleryItem["format"]) =>
   `ratio-${format.replace(":", "x")}`;
 
 export const widthClass = (format: GalleryItem["format"]) =>
-  format === "1:2" || format === "2:2" ? "grid-item--w2" : "";
+  format === "2:1" || format === "2:2" ? "grid-item--w2" : "";
 
 export const applyLayout = (iso: Isotope | null) => {
   if (!iso) return;

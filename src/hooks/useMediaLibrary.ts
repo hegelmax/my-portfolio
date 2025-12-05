@@ -9,7 +9,7 @@ const loadMedia = async () => {
     return mediaCache;
   }
   if (!mediaPromise) {
-    mediaPromise = fetch("/data/media.json")
+    mediaPromise = fetch(`/data/media.json?ts=${Date.now()}`)
       .then((resp) => {
         if (!resp.ok) {
           throw new Error("Failed to load media");

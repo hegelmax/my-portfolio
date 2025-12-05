@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { fetchJsonCached } from "../../../utils/fetchJsonCached";
 import "./ProjectDetailsPage.scss";
 
 interface Project {
@@ -35,11 +36,10 @@ export default function ProjectDetailsPage() {
   const thumbsRef = useRef<HTMLDivElement | null>(null);
   const lightboxWheelTs = useRef(0);
 
-  // грузим проекты и находим нужный по slug
+  // load projects and find by slug
   useEffect(() => {
-    fetch("/data/projects.json")
-      .then((res) => res.json())
-      .then((data: Project[]) => {
+    fetchJsonCached<Project[]>("/data/projects.json")
+      .then((data) => {
         const list = Array.isArray(data) ? data : [];
         setProjects(list);
 
@@ -59,7 +59,7 @@ export default function ProjectDetailsPage() {
       });
   }, [slug]);
 
-  // even if project is null – держим images как пустой массив
+  // even if project is null - keep images as an empty array
   let images: string[] = [];
 
   if (project) {
@@ -67,7 +67,7 @@ export default function ProjectDetailsPage() {
     const cover = project.coverImage;
 
     if (cover) {
-      // coverImage — всегда первый
+      // coverImage is always first
       images = [cover, ...gallery.filter((src) => src !== cover)];
     } else {
       images = gallery;
@@ -130,7 +130,7 @@ export default function ProjectDetailsPage() {
     }
   };
 
-  // управление стрелками и Esc — хук ВСЕГДА вызывается, но внутри есть guard
+  // handle arrows and Esc - hook always runs, internal guard prevents issues
   useEffect(() => {
     if (!isLightboxOpen || !images.length) return;
 
@@ -153,7 +153,7 @@ export default function ProjectDetailsPage() {
     };
   }, [isLightboxOpen]);
 
-  // fallback, если проект не найден
+  // fallback if project is not found
   if (!project) {
     return (
       <section className="project-page">
@@ -175,7 +175,7 @@ export default function ProjectDetailsPage() {
           ← Back to Projects
         </button>
 
-        {/* Заголовок */}
+        {/* Header */}
         <header className="project-page__header">
           <div>
             <h1 className="project-page__title">{project.title}</h1>
@@ -185,11 +185,11 @@ export default function ProjectDetailsPage() {
           </div>
         </header>
 
-        {/* Основной блок: картинки + данные */}
+        {/* Main block: images + data */}
         <div className="project-page__main">
-          {/* ГАЛЕРЕЯ */}
+          {/* GALLERY */}
           <div className="project-page__gallery">
-            {/* Главная большая картинка */}
+            {/* Main large image */}
             <div
               className="project-page__main-image"
               onClick={() => openLightbox(activeIndex)}
@@ -200,7 +200,7 @@ export default function ProjectDetailsPage() {
               />
             </div>
 
-            {/* Лента превью */}
+            {/* Preview strip */}
               {images.length > 1 && (
               <div
                 className="project-page__thumbs"
@@ -224,7 +224,7 @@ export default function ProjectDetailsPage() {
             )}
           </div>
 
-          {/* Правая колонка - данные и описание */}
+          {/* Right column - data and description */}
           <aside className="project-page__sidebar">
             <section className="project-page__data">
               {/*<h2 className="project-page__data-title">Project Data</h2>*/}
@@ -280,7 +280,7 @@ export default function ProjectDetailsPage() {
             <section className="project-page__meta">
               {project.services && project.services.length > 0 && (
                 <div className="project-page__block">
-                  <h3>Services</h3>
+                  <h3>Roles</h3>
                   <ul>
                     {project.services.map((s, idx) => (
                       <li key={idx}>{s}</li>

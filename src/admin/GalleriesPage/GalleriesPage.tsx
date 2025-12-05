@@ -63,7 +63,7 @@ const GalleriesPage: React.FC = () => {
   const load = async () => {
     try {
       setLoading(true);
-      const resp = await fetch("/api/admin/galleries/list.php");
+      const resp = await fetch("/api/admin/galleries/list");
       if (!resp.ok) throw new Error("Failed to load galleries");
       const data = await resp.json();
       setGalleries(Array.isArray(data.galleries) ? data.galleries : []);
@@ -308,7 +308,7 @@ const GalleriesPage: React.FC = () => {
     setStatus(null);
     setError(null);
     try {
-      const resp = await fetch("/api/admin/galleries/save.php", {
+      const resp = await fetch("/api/admin/galleries/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

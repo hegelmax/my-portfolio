@@ -1,18 +1,17 @@
 <?php
-require_once __DIR__ . '/../cors.php';
 
-header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/../_init.php';
 
 // ===== SETTINGS =====
 
-const SEND_TO_EMAIL = "nadia@hegel.uk"; // куда отправлять письма
+const SEND_TO_EMAIL = "nadia@hegel.uk"; // destination for form emails
 const SEND_TO_NAME  = "Paley Website Admin";
 
-const FROM_EMAIL   = "no-reply@hegel.uk"; // должен принадлежать домену
-const FROM_NAME    = "Contact Form";
+const FROM_EMAIL	= "no-reply@hegel.uk"; // must belong to the domain
+const FROM_NAME    	= "Contact Form";
 
 try {
-	include_once(__DIR__ . '/../../config.php');
+	header('Content-Type: application/json; charset=utf-8');
 	
 	if (!defined('BREVO_API_KEY')) {
 		http_response_code(405);
@@ -27,7 +26,7 @@ try {
 		exit;
 	}
 
-	// Читаем сырой JSON
+	// Read raw JSON
 	$raw = file_get_contents('php://input');
 	$data = json_decode($raw, true);
 	
@@ -39,7 +38,7 @@ try {
 	$message    = trim($data['message'] ?? '');
 	$newsletter = !empty($data['newsletter']) ? 'yes' : 'no';
 	
-	// Простая валидация
+	// Basic validation
 	if ($name === '' || $email === '' || $message === '') {
 		http_response_code(400);
 		echo json_encode(['success' => false, 'errors' => 'Missing required fields']);
@@ -65,7 +64,7 @@ try {
 			]
 		],
 		'replyTo' => [
-			'email' => $email,   // клиентский email
+			'email' => $email,   // client email
 			'name'  => $name
 		],
 		'subject' => "New message from contact form",
@@ -111,6 +110,6 @@ try {
     echo json_encode([
         'error' => true,
         'message' => 'Server error',
-        'debug' => $e->getMessage(), // включить только на dev
+        'debug' => $e->getMessage(), // enable only on dev
     ], JSON_UNESCAPED_UNICODE);
 }

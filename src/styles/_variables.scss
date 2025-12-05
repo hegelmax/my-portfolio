@@ -2,49 +2,58 @@
   Global design tokens: fonts, colors, radii, etc.
 */
 
-/* === Fonts === */
-$font-sans: "Roboto", "Inter", "Helvetica Neue", Arial, sans-serif;
-$font-serif: "Lora", serif;
-$font-header: "Playfair Display", serif;
-$font-ui: "Inter", "Helvetica Neue", Arial, sans-serif;
-
-/* === Colors === */
-$color-main: #badcff; // геройский голубой
-$color-bg-body: #f7f7f7;
-$color-bg-page: #ffffff;
-
-$color-text-main: #0e0e0e;
-$color-text-muted: #555555;
-$color-text-soft: #666666;
-$color-text-caption: #999999;
-$color-text-contrast: #ffffff;
-
-$color-border-hero: #000;
-$color-border-light: #eeeeee;
-$color-border-input: #dddddd;
-
-$color-accent: #6c9f8c; // зелёно-серый (ссылки/акценты)
-$color-accent-soft-04: rgba(108, 159, 140, 0.4);
-$color-accent-soft-07: rgba(108, 159, 140, 0.7);
-
-$color-cta-bg: #111111;
-$color-cta-hover-bg: #444;
-$color-success: #3d8c5c;
-$color-error: #c14646;
-
-// Portfolio / filters
-$color-filter-notactive: #f5f5f5;
-$color-filter-active: #f4603a;
-
-// Overlays / backdrops
-$color-overlay-0: rgba(0, 0, 0, 0);
-$color-overlay-55: rgba(0, 0, 0, 0.55);
-$color-backdrop-80: rgba(0, 0, 0, 0.8);
-$color-backdrop-60: rgba(0, 0, 0, 0.6);
-
-/* === Radii === */
-$radius-sm: 4px;
-$radius-md: 6px;
-$radius-lg: 8px;
-$radius-xl: 10px;
-$radius-pill: 999px;
+///* === Fonts === */
+//$font-sans: "Roboto", "Inter", "Helvetica Neue", Arial, sans-serif;
+//$font-serif: "Lora", serif;
+//var(--font-header): "Playfair Display", serif;
+//var(--font-ui): "Inter", "Helvetica Neue", Arial, sans-serif;
+//
+///* === Colors === */
+//$color-main: #badcff; // primary sky-blue accent
+//$color-bg-body: #ffffff;
+//$color-bg-page: #ffffff;
+//
+//$color-text-main: #0e0e0e;
+//$color-text-muted: #555555;
+//var(--color-text-soft): #666666;
+//$color-text-caption: #999999;
+//$color-text-contrast: #ffffff;
+//
+//$color-border-hero: #000;
+//var(--color-border-light): #eeeeee;
+//$color-border-input: #dddddd;
+//
+//$color-accent: #6c9f8c; // greenish-gray accent (links/highlights)
+//$color-accent-soft-04: rgba(108, 159, 140, 0.4);
+//$color-accent-soft-07: rgba(108, 159, 140, 0.7);
+//$color-accent-soft-015: rgba(108, 159, 140, 0.15);
+//
+//var(--color-cta-bg): #111111;
+//var(--color-cta-hover-bg): #444;
+//var(--color-success): #3d8c5c;
+//var(--color-error): #c14646;
+//
+//// Portfolio / filters
+//var(--color-filter-notactive): #f5f5f5;
+//var(--color-filter-active): #f4603a;
+//
+//// Overlays / backdrops
+//var(--color-overlay-0): rgba(0, 0, 0, 0);
+//var(--color-overlay-55): rgba(0, 0, 0, 0.55);
+//$color-backdrop-80: rgba(0, 0, 0, 0.8);
+//$color-backdrop-60: rgba(0, 0, 0, 0.6);
+//$color-backdrop-40: rgba(0, 0, 0, 0.4);
+//
+///* === Radii === */
+//var(--radius-sm): 4px;
+//var(--radius-md): 6px;
+//var(--radius-lg): 8px;
+//var(--radius-xl): 10px;
+//var(--radius-pill): 999px;
+//
+///* === Shadows === */
+//$shadow-subtle: rgba(0, 0, 0, 0.04);
+//$shadow-soft: rgba(0, 0, 0, 0.08);
+//$shadow-card: rgba(0, 0, 0, 0.12);
+//$shadow-card-strong: rgba(0, 0, 0, 0.18);
+//$shadow-ink: rgba(15, 23, 42, 0.18);

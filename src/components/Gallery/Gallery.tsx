@@ -255,6 +255,21 @@ const GallerySection: React.FC<GallerySectionProps> = ({
             const categoryClasses = categories
               .map((category) => categoryClass(category))
               .join(" ");
+            const focusX = item.focusX ?? 50;
+            const focusY = item.focusY ?? 50;
+            const imgStyle: React.CSSProperties = {
+              objectFit: item.fit === "contain" ? "contain" : "cover",
+              objectPosition: `${focusX}% ${focusY}%`,
+              transform: item.rotation ? `rotate(${item.rotation}deg)` : undefined,
+              ["--np-img-transform" as string]: item.rotation
+                ? `rotate(${item.rotation}deg)`
+                : "none",
+            };
+
+            const innerClassName =
+              "np-portfolio__item-inner" +
+              (item.fit === "contain" ? " np-portfolio__item-inner--contain" : "");
+
             return (
               <article
                 key={item.id}
@@ -267,11 +282,12 @@ const GallerySection: React.FC<GallerySectionProps> = ({
                 ].join(" ")}
                 onClick={() => openLightbox(item.id)}
               >
-                <div className="np-portfolio__item-inner">
+                <div className={innerClassName}>
                   <img
                     src={item.image}
                     alt={item.title}
                     className="np-portfolio__img"
+                    style={imgStyle}
                   />
                   <div className="np-portfolio__overlay">
                     <div className="np-portfolio__overlay-content">

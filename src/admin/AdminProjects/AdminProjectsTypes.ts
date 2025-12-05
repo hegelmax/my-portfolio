@@ -15,9 +15,9 @@ export type Project = {
 
   tags?: string[];      // ["editorial", ...]
   services?: string[];  // ["Concept & Direction", ...]
-  description?: string[]; // массив параграфов
+  description?: string[]; // array of paragraphs
 
-  coverImage?: string;  // для UI
+  coverImage?: string;  // for UI
   images?: string[];
 
   relatedIds?: (number | string)[];

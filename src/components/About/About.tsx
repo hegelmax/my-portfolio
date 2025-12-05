@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
 import './About.scss';
 
@@ -20,7 +21,7 @@ const About: React.FC = () => {
         {/* Hero image block */}
         <section className="about-hero">
           <div className="about-hero__image">
-            {/* Заменить src на своё изображение */}
+            {/* Replace src with your own image */}
             <img
               src="/img/about/runway.jpg"
               alt="Minimal fashion studio projectspace"
@@ -32,14 +33,32 @@ const About: React.FC = () => {
         <section className="about-story">
           <h2 className="about-story__title">From Sketch to Showroom</h2>
           <p className="about-story__text">
-            At <a href="https://monologue.fashion" target="_blank">MONOLOGUE</a>, Nadia leads premium womenswear collections from the
+            At{" "}
+            <a
+              href="https://monologue.fashion"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="MONOLOGUE (opens in a new tab)"
+            >
+              MONOLOGUE <i className="nav-external-icon ri-external-link-line" aria-hidden="true" />
+            </a>
+            , Nadia leads premium womenswear collections from the
             first sketch to showroom presentation: concept, fabric stories,
             fittings, sampling and production. Her pieces have been shown at
             Paris Fashion Week and international trade shows, building long-term
             partnerships with boutique retailers.
           </p>
           <p className="about-story__text">
-            Alongside collection project, she consults private clients through <a href="https://renew.style" target="_blank">RENEW.STYLE</a>, creating smart, realistic wardrobes for everyday life,
+            Alongside collection project, she consults private clients through{" "}
+            <a
+              href="https://renew.style"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="RENEW.STYLE (opens in a new tab)"
+            >
+              RENEW.STYLE <i className="nav-external-icon ri-external-link-line" aria-hidden="true" />
+            </a>
+            , creating smart, realistic wardrobes for everyday life,
             events and editorial projects. Each look is built around the
             client’s body, lifestyle and personality, not just trends.
           </p>
@@ -80,7 +99,7 @@ const About: React.FC = () => {
         {/* Approach block with side image, like in the reference */}
         <section className="about-approach">
           <div className="about-approach__image">
-            {/* Заменить src на своё изображение */}
+            {/* Replace src with your own image */}
             <img
               src="/img/about/window-tree-min.jpg"
               alt="Soft natural light in a studio window"
@@ -107,12 +126,12 @@ const About: React.FC = () => {
             </p>
 
             <div className="about-approach__links">
-              <a href="/portfolio" className="about-approach__link">
+              <NavLink to="/portfolio" className="about-approach__link">
                 View Portfolio
-              </a>
-              <a href="/contact" className="about-approach__link">
+              </NavLink>
+              <NavLink to="/contact" className="about-approach__link">
                 Contact Nadia
-              </a>
+              </NavLink>
             </div>
           </div>
         </section>

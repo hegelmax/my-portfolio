@@ -19,7 +19,7 @@
   &__subtitle {
     margin: 0;
     font-size: 14px;
-    color: #9ca3af;
+    color: var(--admin-muted-strong);
   }
 
   &__loading,
@@ -27,17 +27,17 @@
     padding: 12px 14px;
     border-radius: 10px;
     font-size: 14px;
-    background: rgba(148, 163, 184, 0.12);
-    color: #e5e7eb;
+    background: var(--admin-panel-soft);
+    color: var(--admin-text);
   }
 
   &__error {
     padding: 12px 14px;
     border-radius: 10px;
     font-size: 14px;
-    background: rgba(248, 113, 113, 0.1);
-    color: #fecaca;
-    border: 1px solid rgba(248, 113, 113, 0.6);
+    background: var(--admin-negative-soft);
+    color: var(--admin-negative);
+    border: 1px solid var(--admin-negative);
   }
 
   .btn-primary {
@@ -47,14 +47,14 @@
     font-size: 12px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    background: linear-gradient(135deg, #38bdf8, #22c55e);
-    color: #020617;
+    background: linear-gradient(135deg, var(--admin-accent-1), var(--admin-accent-2));
+    color: var(--admin-bg);
     cursor: pointer;
     transition: transform 0.1s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 
     &:hover {
       opacity: 0.95;
-      box-shadow: 0 12px 25px rgba(56, 189, 248, 0.35);
+      box-shadow: 0 12px 25px var(--admin-shadow-1);
     }
 
     &:active {
@@ -71,10 +71,10 @@
 
   .btn-ghost {
     border-radius: 999px;
-    border: 1px solid rgba(148, 163, 184, 0.7);
+    border: 1px solid var(--admin-border-strong);
     padding: 6px 10px;
     background: transparent;
-    color: #e5e7eb;
+    color: var(--admin-text);
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.14em;
@@ -82,18 +82,18 @@
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 
     &:hover {
-      background: #e5e7eb;
-      color: #020617;
+      background: var(--admin-text);
+      color: var(--admin-bg);
       border-color: transparent;
     }
 
     &.btn-ghost--danger {
-      border-color: rgba(248, 113, 113, 0.9);
-      color: #fecaca;
+      border-color: var(--admin-negative);
+      color: var(--admin-negative);
 
       &:hover {
-        background: rgba(248, 113, 113, 0.15);
-        color: #fee2e2;
+        background: var(--admin-negative-soft);
+        color: var(--admin-text);
       }
     }
   }

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useGalleries } from "../../context/GalleriesContext";
+import { usePdfWorksMeta } from "../../hooks/usePdfWorksMeta";
 import { buildFilterRoute } from "../../utils/galleryFilters";
 
 import "./Sidebar.scss";
@@ -9,13 +10,26 @@ export default function Sidebar() {
   const [open, setOpen] = useState<string | null>(null);
   const location = useLocation();
   const { galleries } = useGalleries();
+  const { hasWorks, loading } = usePdfWorksMeta();
+  const showPdfWorks = !loading && hasWorks;
+  const [sticky, setSticky] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const offset = window.scrollY || document.documentElement.scrollTop;
+      setSticky(offset > 40);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const toggle = (name: string) => {
     setOpen((prev) => (prev === name ? null : name));
   };
 
   return (
-    <header id="sidebar">
+    <header id="sidebar" className={sticky ? "is-sticky" : ""}>
       <div className="sidebar-inner">
         <NavLink className="logo smooth-leave" to="/">
           <img src="/img/np.png" alt="NP" />
@@ -38,6 +52,13 @@ export default function Sidebar() {
                 Projects
               </NavLink>
             </li>
+            {showPdfWorks && (
+              <li>
+                <NavLink to="/works/pdf" className={({ isActive }) => "smooth-leave" + (isActive ? " current" : "")}>
+                  PDF works
+                </NavLink>
+              </li>
+            )}
 
             {galleries
               .filter((gallery) => gallery.filters.some((filter) => filter.showInMenu))
@@ -85,8 +106,14 @@ export default function Sidebar() {
               </NavLink>
             </li>
             <li>
-              <a className="smooth-leave" target="_blank" href="https://cv.hgl.mx/nadia_hegel">
-                CV
+              <a
+                className="smooth-leave"
+                target="_blank"
+                href="https://cv.paley.art"
+                rel="noreferrer"
+                aria-label="CV (opens in a new tab)"
+              >
+                CV <i className="nav-external-icon ri-external-link-line" aria-hidden="true" />
               </a>
             </li>
           </ul>

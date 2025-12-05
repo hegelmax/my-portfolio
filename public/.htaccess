@@ -3,10 +3,16 @@ DirectoryIndex index.php index.html
 RewriteEngine On
 RewriteBase /
 
+# === block HTTrack (by User-Agent) and others ===
+RewriteCond %{HTTP_USER_AGENT} ^.*(HTTrack|WebCopier|SiteSnagger|Teleport|Offline\sBrowser|Offline\sNavigator).*$ [NC]
+RewriteRule .* - [F]
+
 # === API routes (PHP backend) ===
-# RewriteRule ^api/(.*)$ /api/$1.php [L,NC]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^api/(.*)$ /api/$1.php [L,NC]
 
 # === React SPA routing ===
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule .* /index.html [L]
+RewriteRule .* /index.php [L]

@@ -4,7 +4,7 @@
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: rgba(15, 23, 42, 0.85);
+  background: var(--admin-overlay-2);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -14,10 +14,10 @@
   .projects-modal {
     width: 100%;
     //max-width: 1320px;
-    background: #020617;
+    background: var(--admin-panel-strong);
     border-radius: 22px;
-    border: 1px solid rgba(148, 163, 184, 0.5);
-    box-shadow: 0 22px 60px rgba(15, 23, 42, 0.95);
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 22px 60px var(--admin-shadow-2);
     padding: 22px 28px 20px;
     box-sizing: border-box;
 
@@ -36,7 +36,7 @@
       width: 100%;
     }
 
-    /* Общие поля */
+    /* Shared fields */
 
     .field {
       display: flex;
@@ -45,13 +45,13 @@
 
       span {
         &::selection {
-          background: rgba(56, 189, 248, 0.3);
+          background: var(--admin-info-soft);
         }
       }
 
       label > span:first-child {
         font-size: 13px;
-        color: #cbd5f5;
+        color: var(--admin-text);
         margin-bottom: 2px;
       }
 
@@ -59,11 +59,11 @@
       textarea {
         width: 100%;
         border-radius: 10px;
-        border: 1px solid rgba(148, 163, 184, 0.7);
+        border: 1px solid var(--admin-border-strong);
         padding: 8px 10px;
         font-size: 14px;
-        background: rgba(15, 23, 42, 0.8);
-        color: #e5e7eb;
+        background: var(--admin-overlay-1);
+        color: var(--admin-text);
         outline: none;
         min-height: 0;
         resize: vertical;
@@ -72,13 +72,13 @@
           background 0.15s ease;
 
         &:focus {
-          border-color: #38bdf8;
-          box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
-          background: rgba(15, 23, 42, 0.95);
+          border-color: var(--admin-accent-1);
+          box-shadow: 0 0 0 1px var(--admin-info-soft);
+          background: var(--admin-overlay-2);
         }
 
         &::placeholder {
-          color: #6b7280;
+          color: var(--admin-muted);
         }
       }
 
@@ -105,13 +105,13 @@
 
       > span:first-child {
         font-size: 13px;
-        color: #cbd5f5;
+        color: var(--admin-text);
       }
     }
 
     .field__hint {
       font-size: 11px;
-      color: #9ca3af;
+      color: var(--admin-muted-strong);
       white-space: nowrap;
     }
 
@@ -119,7 +119,7 @@
       max-width: 210px;
     }
 
-    /* Тумблер Selected / featured */
+    /* Selected / featured toggle */
 
     .switch {
       display: inline-flex;
@@ -136,7 +136,7 @@
         width: 40px;
         height: 22px;
         border-radius: 999px;
-        background: rgba(148, 163, 184, 0.6);
+        background: var(--admin-border);
         padding: 2px;
         display: flex;
         align-items: center;
@@ -148,28 +148,28 @@
         width: 18px;
         height: 18px;
         border-radius: 999px;
-        background: #020617;
-        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
+        background: var(--admin-bg);
+        box-shadow: 0 2px 6px var(--admin-shadow-1);
         transform: translateX(0);
         transition: transform 0.16s ease, background 0.16s ease;
       }
 
       &__label {
         font-size: 13px;
-        color: #e5e7eb;
+        color: var(--admin-text);
       }
 
       input:checked + .switch__track {
-        background: linear-gradient(135deg, #38bdf8, #22c55e);
+        background: linear-gradient(135deg, var(--admin-accent-1), var(--admin-accent-2));
 
         .switch__thumb {
           transform: translateX(16px);
-          background: #e5e7eb;
+          background: var(--admin-text);
         }
       }
     }
 
-    /* Трёхколоночная раскладка */
+    /* Three-column layout */
 
     .project-form-layout {
       display: grid;
@@ -183,7 +183,7 @@
         gap: 14px;
 
         &--left {
-          /* основные поля проекта */
+          /* core project fields */
         }
 
         &--center {
@@ -247,12 +247,12 @@
       padding-right: 4px;
     }
 
-    /* Глобальный футер под тремя колонками */
+    /* Global footer under three columns */
 
     .project-form-footer {
       margin-top: 20px;
       padding-top: 16px;
-      border-top: 1px solid rgba(148, 163, 184, 0.35);
+      border-top: 1px solid var(--admin-border);
       display: flex;
       justify-content: flex-end;
       gap: 10px;
@@ -279,9 +279,9 @@
   gap: 6px;
   padding: 4px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(148,163,184,0.6);
-  background: rgba(15,23,42,0.9);
-  color: #e5e7eb;
+  border: 1px solid var(--admin-border);
+  background: var(--admin-overlay-2);
+  color: var(--admin-text);
   font-size: 11px;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
@@ -292,7 +292,7 @@
   }
 
   &:hover {
-    background: rgba(15,23,42,1);
-    border-color: #38bdf8;
+    background: var(--admin-panel-strong);
+    border-color: var(--admin-accent-1);
   }
 }

@@ -1,16 +1,17 @@
 <?php
+
 require_once '_init.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
 admin_require_auth_json();
 
-// Читаем JSON из тела запроса
+// Read JSON from request body
 $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
 $id = $input['id'] ?? null;
 
-// Базовая нормализация "обязательных" полей
+// Basic normalization of required fields
 $title    = isset($input['title'])    ? trim($input['title'])    : '';
 $slug     = isset($input['slug'])     ? trim($input['slug'])     : '';
 $category = isset($input['category']) ? trim($input['category']) : '';
@@ -18,7 +19,7 @@ $selected = !empty($input['selected']);
 
 $errors = [];
 
-// В твоём UI эти поля по сути обязательные — проверим
+// These fields are required in the UI — validate them
 if ($title === '') {
     $errors[] = 'Title is required';
 }
@@ -37,35 +38,35 @@ if ($errors) {
     exit;
 }
 
-// Записываем нормализованные значения обратно в объект,
-// чтобы в файл ушёл уже "правильный" объект
+// Write normalized values back to the object
+// so the file receives the cleaned object
 $input['title']    = $title;
 $input['slug']     = $slug;
 $input['category'] = $category;
 $input['selected'] = $selected;
 
-// Читаем все проекты из файла
+// Read all projects from file
 $items = projects_read_all();
 $item  = null;
 
-// Новый проект (id нет или пустой)
+// New project (id missing or empty)
 if ($id === null || $id === '' || !is_numeric($id)) {
     $newId = projects_next_id($items);
     $input['id'] = $newId;
 
-    // На всякий случай следим за типом id
+    // Keep id type consistent
     $items[] = $input;
     $item = $input;
 } else {
-    // Обновление существующего проекта
+    // Update existing project
     $id = (int)$id;
     $found = false;
 
     foreach ($items as &$proj) {
         if (isset($proj['id']) && (int)$proj['id'] === $id) {
-            // id фиксируем, даже если вдруг в запросе кто-то прислал другой
+            // Keep id fixed even if a different one was sent in the request
             $input['id'] = $id;
-            // КЛЮЧЕВОЙ МОМЕНТ: сохраняем объект целиком, как пришёл
+            // KEY POINT: save the object exactly as it was received
             $proj = $input;
             $item = $proj;
             $found = true;
@@ -84,7 +85,7 @@ if ($id === null || $id === '' || !is_numeric($id)) {
     }
 }
 
-// Пишем всё обратно в projects.json
+// Write everything back to projects.json
 if (!projects_write_all($items)) {
     echo json_encode([
         'success' => false,
@@ -93,7 +94,7 @@ if (!projects_write_all($items)) {
     exit;
 }
 
-// Успешный ответ — как в delete.php: success + items (+ item для удобства фронта)
+// Successful response — like delete.php: success + items (+ item for convenience)
 echo json_encode([
     'success' => true,
     'item'    => $item,

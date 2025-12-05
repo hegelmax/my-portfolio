@@ -1,27 +1,35 @@
 <?php
+
 require_once '_init.php';
 
 header('Content-Type: application/json; charset=utf-8');
-admin_require_auth_json();
 
-$input = json_decode(file_get_contents('php://input'), true) ?? [];
+$raw = $_SERVER['REQUEST_METHOD'] === 'GET'
+    ? $_GET
+    : (json_decode(file_get_contents('php://input'), true) ?? []);
 
-$tags       = $input['tags'] ?? [];
-$search     = trim($input['search'] ?? '');
-$page       = max(1, (int)($input['page'] ?? 1));
-$pageSize   = max(1, min(1000, (int)($input['pageSize'] ?? 60)));
-
-if (!is_array($tags)) $tags = [];
+$tags = $raw['tags'] ?? [];
+if (!is_array($tags)) {
+    // accept comma-separated string
+    if (is_string($tags) && $tags !== '') {
+        $tags = array_filter(array_map('trim', explode(',', $tags)), static fn($v) => $v !== '');
+    } else {
+        $tags = [];
+    }
+}
+$search   = trim($raw['search'] ?? '');
+$page     = max(1, (int)($raw['page'] ?? 1));
+$pageSize = max(1, min(1000, (int)($raw['pageSize'] ?? 60)));
 
 $all = media_read_all();
 
-// фильтрация
+// filtering
 $filtered = [];
 $tagsSet = [];
 foreach ($all as $item) {
     $ok = true;
 
-    // фильтр по тегам: все указанные теги должны присутствовать
+    // tag filter: all provided tags must be present
     if ($tags) {
         $itemTags = isset($item['tags']) && is_array($item['tags']) ? $item['tags'] : [];
         foreach ($tags as $t) {
@@ -32,7 +40,7 @@ foreach ($all as $item) {
         }
     }
 
-    // поиск по имени/пути
+    // search by name/path
     if ($ok && $search !== '') {
         $hay = ($item['filename'] ?? '') . ' ' . ($item['path'] ?? '');
         if (stripos($hay, $search) === false) {
@@ -53,7 +61,7 @@ foreach ($all as $item) {
 }
 }
 
-// пагинация
+// pagination
 $total = count($filtered);
 $totalPages = max(1, (int)ceil($total / $pageSize));
 $page = min($page, $totalPages);

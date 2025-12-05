@@ -1,9 +1,5 @@
 <?php
-//ini_set('display_errors', 1);
-//ini_set('display_startup_errors', 1);
-//error_reporting(E_ALL);
 
-session_start();
-
-include_once '_paths.php';
-include_once API_DIR . '/cors.php';
+include_once __DIR__  . '/../_init.php';
+include_once API_DIR  . '/_utils.php';
+include_once API_DIR  . '/cors.php';

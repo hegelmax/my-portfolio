@@ -1,4 +1,5 @@
 <?php
+
 function media_file_path(): string {
     return DATA_DIR.'/media.json';
 }

@@ -13,6 +13,8 @@ public/cache
 public/images
 public/img/portfolio
 public/img/publications
+public/pdf
+public/_SYNCAPP
 
 node_modules
 dist

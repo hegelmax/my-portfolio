@@ -8,11 +8,20 @@ import React, {
 import type { KeyboardEvent } from "react";
 import "./MediaPicker.scss";
 
+type MediaFormatOption = "auto" | "1:1" | "1:2" | "2:1" | "2:2";
+
 type MediaItem = {
   id: number;
   path: string;
   filename: string;
   tags?: string[];
+  width?: number;
+  height?: number;
+  format?: Exclude<MediaFormatOption, "auto">;
+  focusX?: number;
+  focusY?: number;
+  fit?: "cover" | "contain";
+  rotation?: number;
 };
 
 type MediaPickerVariant = "modal" | "embedded";
@@ -76,6 +85,25 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
   const [renameStatus, setRenameStatus] = useState<string | null>(null);
   const [renaming, setRenaming] = useState(false);
   const [individualTagDeleteMode, setIndividualTagDeleteMode] = useState(false);
+  const [showMetaPanel, setShowMetaPanel] = useState(false);
+  const [showSelectedOnly, setShowSelectedOnly] = useState(false);
+  const [metaForm, setMetaForm] = useState<{
+    format: MediaFormatOption;
+    fit: "cover" | "contain";
+    focusMode: "auto" | "manual";
+    focusX: number;
+    focusY: number;
+    rotation: number;
+  }>({
+    format: "auto",
+    fit: "cover",
+    focusMode: "auto",
+    focusX: 50,
+    focusY: 50,
+    rotation: 0,
+  });
+  const [metaStatus, setMetaStatus] = useState<string | null>(null);
+  const [metaSaving, setMetaSaving] = useState(false);
 
   const upsertItemsMap = useCallback((updatedItems: MediaItem[]) => {
     if (!updatedItems || updatedItems.length === 0) return;
@@ -101,16 +129,15 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
       const size = MAX_PAGE_SIZE;
 
       while (aggregated.length < total) {
-        const resp = await fetch("/api/admin/media/list.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const params = new URLSearchParams();
+        selectedTags.forEach((tag) => params.append("tags[]", tag));
+        if (search) params.set("search", search);
+        params.set("page", String(page));
+        params.set("pageSize", String(size));
+
+        const resp = await fetch(`/api/admin/media/list?${params.toString()}`, {
+          method: "GET",
           credentials: "include",
-          body: JSON.stringify({
-            tags: selectedTags,
-            search,
-            page,
-            pageSize: size,
-          }),
         });
 
         const data = await resp.json();
@@ -158,6 +185,8 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
     setRenameValue("");
     setRenameMode(false);
     setIndividualTagDeleteMode(false);
+    setShowMetaPanel(false);
+    setShowSelectedOnly(false);
     load();
   }, [isOpen, load]);
 
@@ -208,6 +237,9 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
       pad(now.getHours()) +
       pad(now.getMinutes()) +
       pad(now.getSeconds());
+    const uploadTags = Array.from(
+      new Set([batchTag, ...selectedTags.filter((t) => t && t.trim() !== "")]),
+    );
 
     try {
       setUploading(true);
@@ -216,7 +248,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("tags", batchTag);
+        formData.append("tags", uploadTags.join(","));
 
         const resp = await fetch("/api/admin/media/upload", {
           method: "POST",
@@ -265,7 +297,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
     try {
       setDeleting(true);
       setBulkStatus(null);
-      const resp = await fetch("/api/admin/media/delete.php", {
+      const resp = await fetch("/api/admin/media/delete", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -302,6 +334,42 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
       .filter(Boolean) as MediaItem[];
   }, [itemsMap, selectedPaths]);
 
+  useEffect(() => {
+    if (showSelectedOnly && selectedPaths.length === 0) {
+      setShowSelectedOnly(false);
+    }
+  }, [showSelectedOnly, selectedPaths.length]);
+
+  useEffect(() => {
+    const primary = selectedItems[0];
+    if (!primary) {
+      setMetaStatus(null);
+      setMetaForm((prev) => ({
+        ...prev,
+        format: "auto",
+        fit: "cover",
+        focusMode: "auto",
+        rotation: 0,
+      }));
+      return;
+    }
+    setMetaStatus(null);
+    setMetaForm({
+      format: primary.format ?? "auto",
+      fit: primary.fit === "contain" ? "contain" : "cover",
+      focusMode:
+        typeof primary.focusX === "number" && typeof primary.focusY === "number"
+          ? "manual"
+          : "auto",
+      focusX: typeof primary.focusX === "number" ? primary.focusX : 50,
+      focusY: typeof primary.focusY === "number" ? primary.focusY : 50,
+      rotation:
+        typeof primary.rotation === "number" && Number.isFinite(primary.rotation)
+          ? ((primary.rotation % 360) + 360) % 360
+          : 0,
+    });
+  }, [selectedItems]);
+
   const selectionTagEntries = useMemo(() => {
     const total = selectedItems.length;
     if (total === 0) return [] as { tag: string; count: number; full: boolean }[];
@@ -337,7 +405,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
   const applyRename = async (from: string, to: string) => {
     const trimmed = to.trim();
     if (!trimmed || trimmed === from) {
-      setRenameStatus("Введите новое имя тега");
+      setRenameStatus("Enter a new tag name");
       return;
     }
     setRenaming(true);
@@ -397,11 +465,11 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
   ) => {
     const shouldShowStatus = options.showStatus !== false;
     if (targetPaths.length === 0) {
-      if (shouldShowStatus) setBulkStatus("Выберите изображения");
+      if (shouldShowStatus) setBulkStatus("Select images");
       return;
     }
     if (action !== "remove" && tagsList.length === 0) {
-      if (shouldShowStatus) setBulkStatus("Укажите тег");
+      if (shouldShowStatus) setBulkStatus("Specify a tag");
       return;
     }
 
@@ -428,7 +496,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
         setBulkTagInput("");
       }
       if (shouldShowStatus) {
-        setBulkStatus("Теги обновлены");
+        setBulkStatus("Tags updated");
       }
       if (options.refreshAfterSuccess !== false) {
         await load();
@@ -458,6 +526,84 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
       ...options,
     };
     return mutateTags(action, tagsList, targetPaths, mergedOptions);
+  };
+
+  const clampPercent = (value: number) => {
+    if (Number.isNaN(value)) return 50;
+    return Math.min(100, Math.max(0, Math.round(value)));
+  };
+
+  const handleMetaFieldChange = <K extends "format" | "fit" | "focusMode">(
+    key: K,
+    value: MediaFormatOption | "cover" | "contain" | "auto" | "manual",
+  ) => {
+    setMetaForm((prev) => ({
+      ...prev,
+      [key]: value as any,
+      ...(key === "focusMode" && value === "auto" ? { focusX: 50, focusY: 50 } : {}),
+    }));
+  };
+
+  const handleFocusChange = (key: "focusX" | "focusY", value: string) => {
+    const num = clampPercent(Number(value));
+    setMetaForm((prev) => ({
+      ...prev,
+      focusMode: "manual",
+      [key]: num,
+    }));
+  };
+
+  const rotate = (delta: number) => {
+    setMetaForm((prev) => {
+      const next = ((prev.rotation + delta) % 360 + 360) % 360;
+      return { ...prev, rotation: next };
+    });
+  };
+
+  const resetRotation = () => {
+    setMetaForm((prev) => ({ ...prev, rotation: 0 }));
+  };
+
+  const saveMeta = async (applyToAllSelected: boolean) => {
+    if (selectedPaths.length === 0) return;
+    const targets = applyToAllSelected ? selectedPaths : [selectedPaths[0]];
+    setMetaSaving(true);
+    setMetaStatus(null);
+
+    try {
+      for (const path of targets) {
+        const item = itemsMap[path];
+        if (!item?.id) continue;
+
+        const resp = await fetch("/api/admin/media/update", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: item.id,
+            format: metaForm.format === "auto" ? null : metaForm.format,
+            fit: metaForm.fit,
+            focusX: metaForm.focusMode === "manual" ? metaForm.focusX : null,
+            focusY: metaForm.focusMode === "manual" ? metaForm.focusY : null,
+            rotation: metaForm.rotation,
+          }),
+        });
+
+        const data = await resp.json();
+        if (!data.success) {
+          throw new Error(data.error || "Failed to save meta");
+        }
+      }
+
+      setMetaStatus(
+        applyToAllSelected ? "Applied to all selected" : "Saved",
+      );
+      await load();
+    } catch (e: any) {
+      setMetaStatus(e?.message || "Failed to save");
+    } finally {
+      setMetaSaving(false);
+    }
   };
 
   const handleSelectionInputKeyDown = (
@@ -493,6 +639,12 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
     [isEmbedded],
   );
 
+  const displayedItems = useMemo(() => {
+    if (!showSelectedOnly) return items;
+    const selectedSet = new Set(selectedPaths);
+    return items.filter((item) => selectedSet.has(item.path));
+  }, [items, showSelectedOnly, selectedPaths]);
+
   if (!isEmbedded && !isOpen) return null;
 
   const toolbar = (
@@ -510,7 +662,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
         <button
           type="button"
           className="media-picker__icon-btn"
-          title="Добавить фото"
+          title="Upload photos"
           onClick={handleUploadClick}
           disabled={uploading}
         >
@@ -521,7 +673,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
           className={
             "media-picker__icon-btn" + (renameMode ? " media-picker__icon-btn--active" : "")
           }
-          title={renameMode ? "Выйти из режима переименования" : "Переименовать теги"}
+          title={renameMode ? "Exit rename mode" : "Rename tags"}
           onClick={toggleRenameMode}
           disabled={renaming}
         >
@@ -535,12 +687,23 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
           }
           title={
             individualTagDeleteMode
-              ? "Выключить режим удаления тегов"
-              : "Удалять теги у отдельных фото"
+              ? "Disable per-photo tag removal"
+              : "Delete tags on individual photos"
           }
           onClick={() => setIndividualTagDeleteMode((prev) => !prev)}
         >
           ❌
+        </button>
+        <button
+          type="button"
+          className={
+            "media-picker__icon-btn" + (showMetaPanel ? " media-picker__icon-btn--active" : "")
+          }
+          title={showMetaPanel ? "Hide cropping panel" : "Show cropping panel"}
+          onClick={() => setShowMetaPanel((prev) => !prev)}
+          disabled={selectedPaths.length === 0 && !showMetaPanel}
+        >
+          ⌗
         </button>
         <button
           type="button"
@@ -591,6 +754,18 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
         )}
         <button
           type="button"
+          className={
+            "media-picker__btn media-picker__btn--ghost" +
+            (showSelectedOnly ? " media-picker__btn--active" : "")
+          }
+          onClick={() => setShowSelectedOnly((prev) => !prev)}
+          disabled={selectedPaths.length === 0 && !showSelectedOnly}
+          title="Show only selected"
+        >
+          {showSelectedOnly ? "Show all" : "Only selected"}
+        </button>
+        <button
+          type="button"
           className="media-picker__btn media-picker__btn--ghost"
           onClick={load}
           disabled={loading}
@@ -602,7 +777,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
   );
 
   const selectionPanel =
-    bulkEditingEnabled && selectedPaths.length > 0 ? (
+    !showMetaPanel && bulkEditingEnabled && selectedPaths.length > 0 ? (
       <div className="media-picker__selection-panel">
         <div className="media-picker__selection-meta">
           <span>{selectedPaths.length} selected</span>
@@ -630,7 +805,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
               })
             }
           >
-            Добавить
+            Add
           </button>
           <datalist id={tagsDatalistId}>
             {allTags.map((tag) => (
@@ -641,7 +816,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
         <div className="media-picker__selection-tags">
           {selectionTagEntries.length === 0 && (
             <span className="media-picker__selection-placeholder">
-              Нет тегов у выбранных фото
+              No tags on selected photos
             </span>
           )}
           {selectionTagEntries.map(({ tag, full }) => (
@@ -659,7 +834,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
                 <button
                   type="button"
                   className="media-picker__selection-action"
-                  title="Заполнить тег на всех фото"
+                  title="Apply tag to all selected photos"
                   onClick={() => handleSelectionTagFill(tag)}
                   disabled={bulkLoading}
                 >
@@ -669,7 +844,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
               <button
                 type="button"
                 className="media-picker__selection-action"
-                title="Удалить тег со всех выбранных"
+                title="Remove tag from all selected"
                 onClick={() => handleSelectionTagRemove(tag)}
                 disabled={bulkLoading}
               >
@@ -681,7 +856,159 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
       </div>
     ) : null;
 
-  const tagsRow = (
+  const metaPanel =
+    showMetaPanel && selectedPaths.length > 0 ? (
+      <div className="media-picker__meta-panel">
+        <div className="media-picker__meta-header">
+          <div>
+            <div className="media-picker__meta-title">
+              Cropping for selected ({selectedPaths.length})
+            </div>
+            <div className="media-picker__meta-subtitle">
+              Format, rotation, and frame focus for the gallery
+            </div>
+          </div>
+          {metaStatus && (
+            <div className="media-picker__meta-status">{metaStatus}</div>
+          )}
+        </div>
+
+        <div className="media-picker__meta-grid">
+          <label className="media-picker__meta-field">
+            <span>Format</span>
+            <select
+              value={metaForm.format}
+              onChange={(e) =>
+                handleMetaFieldChange("format", e.target.value as MediaFormatOption)
+              }
+            >
+              <option value="auto">Auto (by image size)</option>
+              <option value="1:1">1 × 1</option>
+              <option value="2:1">2 × 1</option>
+              <option value="1:2">1 × 2</option>
+              <option value="2:2">2 × 2</option>
+            </select>
+          </label>
+
+          <label className="media-picker__meta-field">
+            <span>Display</span>
+            <select
+              value={metaForm.fit}
+              onChange={(e) => handleMetaFieldChange("fit", e.target.value as "cover" | "contain")}
+            >
+              <option value="cover">Crop to container</option>
+              <option value="contain">Preserve aspect (with padding)</option>
+            </select>
+          </label>
+
+          <div className="media-picker__meta-field media-picker__meta-field--full">
+            <div className="media-picker__meta-row">
+              <span>Frame focus</span>
+              <label className="media-picker__meta-check">
+                <input
+                  type="checkbox"
+                  checked={metaForm.focusMode === "auto"}
+                  onChange={(e) =>
+                    handleMetaFieldChange("focusMode", e.target.checked ? "auto" : "manual")
+                  }
+                />
+                <span>Auto-center</span>
+              </label>
+            </div>
+            <div className="media-picker__meta-focus">
+              <label>
+                X (%)
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={metaForm.focusX}
+                  onChange={(e) => handleFocusChange("focusX", e.target.value)}
+                  disabled={metaForm.focusMode === "auto"}
+                />
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={metaForm.focusX}
+                  onChange={(e) => handleFocusChange("focusX", e.target.value)}
+                  disabled={metaForm.focusMode === "auto"}
+                />
+              </label>
+              <label>
+                Y (%)
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={metaForm.focusY}
+                  onChange={(e) => handleFocusChange("focusY", e.target.value)}
+                  disabled={metaForm.focusMode === "auto"}
+                />
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={metaForm.focusY}
+                  onChange={(e) => handleFocusChange("focusY", e.target.value)}
+                  disabled={metaForm.focusMode === "auto"}
+                />
+              </label>
+            </div>
+          </div>
+          <div className="media-picker__meta-field">
+            <span>Rotation</span>
+            <div className="media-picker__meta-rotation">
+              <button
+                type="button"
+                className="media-picker__btn media-picker__btn--ghost"
+                onClick={() => rotate(-90)}
+              >
+                ↺ -90°
+              </button>
+              <div className="media-picker__meta-rotation-value">
+                {Math.round(metaForm.rotation)}°
+              </div>
+              <button
+                type="button"
+                className="media-picker__btn media-picker__btn--ghost"
+                onClick={() => rotate(90)}
+              >
+                ↻ +90°
+              </button>
+              <button
+                type="button"
+                className="media-picker__btn media-picker__btn--ghost"
+                onClick={resetRotation}
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="media-picker__meta-actions">
+          <button
+            type="button"
+            className="media-picker__btn media-picker__btn--ghost"
+            onClick={() => saveMeta(false)}
+            disabled={metaSaving}
+          >
+            {metaSaving ? "Saving..." : "Save (first selected)"}
+          </button>
+          <button
+            type="button"
+            className="media-picker__btn media-picker__btn--primary"
+            onClick={() => saveMeta(true)}
+            disabled={metaSaving}
+          >
+            {metaSaving ? "Saving..." : "Apply to all selected"}
+          </button>
+        </div>
+      </div>
+    ) : null;
+
+  const tagsRow = !showMetaPanel ? (
     <div className="media-picker__tags-wrap">
       {renameStatus && renameMode && (
         <div className="media-picker__rename-status-text">{renameStatus}</div>
@@ -718,7 +1045,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
                     type="button"
                     className="media-picker__tag-edit-btn"
                     onClick={() => startTagRename(tag)}
-                    title="Переименовать тег"
+                    title="Rename tag"
                   >
                     ✏️
                   </button>
@@ -728,10 +1055,10 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
           })}
         </div>
       ) : (
-        <div className="media-picker__status">Нет тегов</div>
+        <div className="media-picker__status">No tags</div>
       )}
     </div>
-  );
+  ) : null;
 
   const pickerBody = (
     <div
@@ -759,6 +1086,7 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
 
       {toolbar}
       {selectionPanel}
+      {metaPanel}
       {tagsRow}
 
       {error && <div className="media-picker__error">{error}</div>}
@@ -770,14 +1098,53 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
 
         {!loading && !error && items.length === 0 && (
           <div className="media-picker__status">
-            Медиа не найдены. Попробуйте изменить фильтры.
+            No media found. Try adjusting filters.
           </div>
         )}
 
         {!loading &&
           !error &&
-          items.map((item) => {
+          displayedItems.map((item) => {
             const isSelected = selectedPaths.includes(item.path);
+            const usePreview = showMetaPanel && isSelected && selectedPaths.length > 0;
+            const previewFormat = usePreview ? metaForm.format : (item.format ?? "auto");
+            const aspectRatio =
+              previewFormat === "2:1"
+                ? "2 / 1"
+                : previewFormat === "1:2"
+                ? "1 / 2"
+                : previewFormat === "2:2" || previewFormat === "1:1"
+                ? "1 / 1"
+                : undefined;
+            const focusX = usePreview
+              ? metaForm.focusMode === "auto"
+                ? 50
+                : metaForm.focusX
+              : typeof item.focusX === "number"
+              ? item.focusX
+              : 50;
+            const focusY = usePreview
+              ? metaForm.focusMode === "auto"
+                ? 50
+                : metaForm.focusY
+              : typeof item.focusY === "number"
+              ? item.focusY
+              : 50;
+            const fit = usePreview ? metaForm.fit : item.fit;
+            const rotation = usePreview
+              ? metaForm.rotation
+              : typeof item.rotation === "number"
+              ? ((item.rotation % 360) + 360) % 360
+              : 0;
+            const thumbStyle: React.CSSProperties = {
+              objectFit: fit === "contain" ? "contain" : "cover",
+              objectPosition: `${focusX}% ${focusY}%`,
+              transform: rotation ? `rotate(${rotation}deg)` : undefined,
+            };
+            const thumbWrapperStyle: React.CSSProperties =
+              usePreview && aspectRatio
+                ? { aspectRatio, height: "auto" }
+                : {};
             return (
               <button
                 key={item.id}
@@ -788,35 +1155,41 @@ const MediaPicker: React.FC<MediaPickerProps> = ({
                 }
                 onClick={() => toggleSelectPath(item.path)}
               >
-                <div className="media-picker__thumb">
-                  <img src={item.path} alt={item.filename} />
-                  <div className="media-picker__thumb-tags">
-                    {(item.tags && item.tags.length > 0 ? item.tags : ["No tags"]).map((tag, index) => (
-                      <span
-                        key={tag + index.toString()}
-                        className={
-                          "media-picker__item-tag" +
-                          (tag === "No tags"
-                            ? " media-picker__item-tag--empty"
-                            : "")
-                        }
-                      >
-                        {tag === "No tags" ? tag : `#${tag}`}
-                        {tag !== "No tags" && individualTagDeleteMode && (
-                          <button
-                            type="button"
-                            className="media-picker__item-tag-remove"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleIndividualTagRemove(item.path, tag);
-                            }}
-                          >
-                            ×
-                          </button>
-                        )}
-                      </span>
-                    ))}
-                  </div>
+                <div className="media-picker__thumb" style={thumbWrapperStyle}>
+                  <img
+                    src={item.path}
+                    alt={item.filename}
+                    style={thumbStyle}
+                  />
+                  {!showMetaPanel && (
+                    <div className="media-picker__thumb-tags">
+                      {(item.tags && item.tags.length > 0 ? item.tags : ["No tags"]).map((tag, index) => (
+                        <span
+                          key={tag + index.toString()}
+                          className={
+                            "media-picker__item-tag" +
+                            (tag === "No tags"
+                              ? " media-picker__item-tag--empty"
+                              : "")
+                          }
+                        >
+                          {tag === "No tags" ? tag : `#${tag}`}
+                          {tag !== "No tags" && individualTagDeleteMode && (
+                            <button
+                              type="button"
+                              className="media-picker__item-tag-remove"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleIndividualTagRemove(item.path, tag);
+                              }}
+                            >
+                              ×
+                            </button>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {isSelected && (
                   <div className="media-picker__item-check">✓</div>

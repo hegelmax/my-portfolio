@@ -22,7 +22,7 @@
 .admin-dashboard__subtitle {
   margin: 0;
   font-size: 14px;
-  color: #9ca3af;
+  color: var(--admin-muted-strong);
 }
 
 .admin-dashboard__actions {
@@ -39,17 +39,17 @@
 }
 
 .admin-dashboard__loading {
-  background: rgba(148, 163, 184, 0.12);
-  color: #e5e7eb;
+  background: var(--admin-panel-soft);
+  color: var(--admin-text);
 }
 
 .admin-dashboard__error {
-  background: rgba(248, 113, 113, 0.1);
-  color: #fecaca;
-  border: 1px solid rgba(248, 113, 113, 0.6);
+  background: var(--admin-negative-soft);
+  color: var(--admin-text);
+  border: 1px solid var(--admin-negative);
 }
 
-/* Верхние метрики */
+/* Top metrics */
 .admin-dashboard__cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -67,15 +67,14 @@
 .metric-card {
   border-radius: 16px;
   padding: 16px 18px;
-  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
-              #020617;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.6);
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border);
+  box-shadow: 0 16px 30px var(--admin-shadow-1);
 }
 
 .metric-card__label {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--admin-muted-strong);
   margin-bottom: 4px;
 }
 
@@ -86,18 +85,18 @@
 
 .metric-card__hint {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--admin-muted-strong);
   margin-top: 6px;
 
   code {
     font-size: 11px;
-    background: rgba(15, 23, 42, 0.9);
+    background: var(--admin-panel-strong);
     padding: 2px 6px;
     border-radius: 6px;
   }
 }
 
-/* Нижняя сетка */
+/* Lower grid */
 .admin-dashboard__grid {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
@@ -111,8 +110,8 @@
 .panel {
   border-radius: 16px;
   padding: 16px 18px 18px;
-  background: #020617;
-  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border);
 }
 
 .panel__header {
@@ -127,12 +126,12 @@
 .panel__subtitle {
   margin: 0;
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--admin-muted-strong);
 }
 
 .panel__empty {
   font-size: 14px;
-  color: #9ca3af;
+  color: var(--admin-muted-strong);
 }
 
 .panel-table {
@@ -150,12 +149,12 @@
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #9ca3af;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+    color: var(--admin-muted-strong);
+    border-bottom: 1px solid var(--admin-border);
   }
 
   tbody tr:nth-child(even) {
-    background: rgba(15, 23, 42, 0.65);
+    background: var(--admin-overlay-1);
   }
 }
 
@@ -163,7 +162,7 @@
   margin: 4px 0 0;
   padding-left: 16px;
   font-size: 14px;
-  color: #e5e7eb;
+  color: var(--admin-text);
 
   li + li {
     margin-top: 6px;
@@ -171,13 +170,13 @@
 
   code {
     font-size: 11px;
-    background: rgba(15, 23, 42, 0.9);
+    background: var(--admin-panel-strong);
     padding: 2px 6px;
     border-radius: 6px;
   }
 }
 
-/* Кнопки (используются в header) */
+/* Buttons (used in header) */
 
 .btn-secondary {
   display: inline-flex;
@@ -185,19 +184,19 @@
   justify-content: center;
   padding: 8px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.7);
+  border: 1px solid var(--admin-border-strong);
   font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   text-decoration: none;
-  color: #e5e7eb;
+  color: var(--admin-text);
   background: transparent;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 
   &:hover {
-    background: #e5e7eb;
-    color: #020617;
+    background: var(--admin-text);
+    color: var(--admin-bg);
     border-color: transparent;
   }
 }

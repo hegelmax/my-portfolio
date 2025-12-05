@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/_init.php';
 
 header('Content-Type: application/json; charset=utf-8');
@@ -17,13 +18,13 @@ $password = $input['password'] ?? '';
 $errors = [];
 
 if ($login === '') {
-    $errors[] = 'Введите логин';
+    $errors[] = 'Enter a login';
 }
 if ($password === '') {
-    $errors[] = 'Введите пароль';
+    $errors[] = 'Enter a password';
 }
 if (strlen($password) < 6) {
-    $errors[] = 'Пароль должен быть не короче 6 символов';
+    $errors[] = 'Password must be at least 6 characters long';
 }
 
 if ($errors) {
@@ -32,7 +33,7 @@ if ($errors) {
 }
 
 if (!admin_save_new($login, $password)) {
-    echo json_encode(['success' => false, 'errors' => ['Не удалось сохранить конфиг']], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['success' => false, 'errors' => ['Failed to save config']], JSON_UNESCAPED_UNICODE);
     exit;
 }
 

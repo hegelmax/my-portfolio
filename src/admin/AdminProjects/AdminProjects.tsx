@@ -47,7 +47,7 @@ const AdminProjects: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
 
-  // загрузка списка проектов
+  // load projects list
   useEffect(() => {
     if (!authReady) return;
 
@@ -201,8 +201,8 @@ const AdminProjects: React.FC = () => {
         <div>
           <h1 className="projects-page__title">Projects</h1>
           <p className="projects-page__subtitle">
-            Управление карточками проектов: название, slug, категория, флаг
-            selected, обложка и галерея.
+            Manage project cards: title, slug, category, selected flag, cover,
+            and gallery.
           </p>
         </div>
         <div>
@@ -239,7 +239,7 @@ const AdminProjects: React.FC = () => {
         />
       )}
 
-      {/* Модалка редактирования — теперь отдельный компонент */}
+      {/* Edit modal — separated component */}
       <ProjectEditorModal
         project={editing}
         allProjects={items}

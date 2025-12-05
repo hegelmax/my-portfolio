@@ -31,7 +31,7 @@ const Contact: React.FC = () => {
     e.preventDefault();
     setStatus(null);
 
-    // Простая валидация на фронте
+    // Basic client-side validation
     if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
       setStatus("error");
       return;
@@ -40,7 +40,7 @@ const Contact: React.FC = () => {
     try {
       setIsSubmitting(true);
 
-      const response = await fetch("/api/contact", {
+      const response = await fetch("/api/contact/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +81,7 @@ const Contact: React.FC = () => {
         </header>
 
         <section className="contact-layout">
-          {/* Левая колонка — текст и прямые контакты */}
+          {/* Left column - text and direct contacts */}
           <div className="contact-info">
             <h2 className="contact-info__title">Project with Nadia</h2>
             <p className="contact-info__text">
@@ -100,7 +100,7 @@ const Contact: React.FC = () => {
             </div>
           </div>
 
-          {/* Правая колонка — форма */}
+          {/* Right column - form */}
           <div className="contact-form-wrapper">
             <form className="contact-form" onSubmit={handleSubmit} noValidate>
               <div className="contact-form__row">

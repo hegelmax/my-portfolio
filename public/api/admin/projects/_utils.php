@@ -1,4 +1,5 @@
 <?php
+
 function projects_read_all(): array {
     if (!file_exists(PROJECTS_FILE)) {
         return [];

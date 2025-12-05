@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { fetchJsonCached } from "../../../utils/fetchJsonCached";
 
 import "./ProjectsGrid.scss";
 
@@ -27,7 +28,7 @@ export default function ProjectsGrid({
   const [projects, setProjects] = useState<Project[]>([]);
   const [visibleCount, setVisibleCount] = useState<number>(limit || 0);
 
-  // Функция перемешивания (Fisher–Yates)
+  // Shuffle function (Fisher–Yates)
   const shuffleArray = (arr: Project[]): Project[] => {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -38,17 +39,16 @@ export default function ProjectsGrid({
   };
 
   useEffect(() => {
-    fetch("/data/projects.json")
-      .then((res) => res.json())
-      .then((data: Project[]) => {
+    fetchJsonCached<Project[]>("/data/projects.json")
+      .then((data) => {
         let list = Array.isArray(data) ? data : [];
 
-        // 1) Берём только selected, если нужно
+        // 1) Filter only selected if needed
         if (selectedOnly) {
           list = list.filter((p) => p.selected === true);
         }
 
-        // 2) Перемешиваем всегда (только selected или все)
+        // 2) Always shuffle (selected or all)
         list = shuffleArray(list);
 
         setProjects(list);
@@ -56,7 +56,7 @@ export default function ProjectsGrid({
         if (limit) {
           setVisibleCount(limit);
         } else if (infinite) {
-          // первоначальная загрузка infinite-режима
+          // initial load in infinite mode
           setVisibleCount(Math.min(6, list.length));
         }
       })

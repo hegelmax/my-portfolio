@@ -1,0 +1,248 @@
+@use "../../styles" as *;
+
+.seo-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--admin-text);
+}
+
+.seo-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  .seo-page__title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  .seo-page__subtitle {
+    margin: 4px 0 0;
+    color: var(--admin-muted);
+  }
+
+  .seo-page__actions {
+    display: flex;
+    gap: 10px;
+  }
+}
+
+.seo-page__status {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--admin-info-soft);
+  color: var(--admin-text);
+}
+
+.seo-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+}
+
+.seo-sidebar {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--admin-muted);
+  }
+
+  &__subtitle {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--admin-muted);
+    margin-top: 6px;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__item-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    &.is-active .seo-sidebar__item {
+      border-color: var(--admin-accent-1);
+      background: var(--admin-info-soft);
+      color: var(--admin-text);
+    }
+  }
+
+  &__item {
+    flex: 1;
+    text-align: left;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--admin-border);
+    background: var(--admin-bg);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    &.is-active {
+      border-color: var(--admin-accent-1);
+      background: var(--admin-info-soft);
+      color: var(--admin-text);
+    }
+
+    &:hover {
+      border-color: var(--admin-accent-1);
+    }
+  }
+
+  &__remove {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    border: 1px solid var(--admin-border);
+    background: var(--admin-panel-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    color: var(--admin-muted);
+
+    &:hover {
+      color: var(--admin-text);
+      border-color: var(--admin-accent-1);
+    }
+  }
+
+  &__empty {
+    color: var(--admin-muted);
+    font-size: 13px;
+  }
+
+  &__adder {
+    display: flex;
+    gap: 6px;
+
+    input {
+      flex: 1;
+      padding: 6px 8px;
+      border: 1px solid var(--admin-border);
+      border-radius: var(--radius-sm);
+    }
+
+    button {
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--admin-border);
+      background: var(--admin-bg);
+      cursor: pointer;
+    }
+  }
+
+  &__suggestions {
+    border-top: 1px solid var(--admin-border);
+    padding-top: 8px;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 4px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    button {
+      width: 100%;
+      text-align: left;
+      border: none;
+      background: none;
+      padding: 4px 0;
+      cursor: pointer;
+      color: var(--admin-text);
+
+      &:hover {
+        color: var(--admin-accent-1);
+      }
+    }
+  }
+
+  &__path {
+    color: var(--admin-muted);
+    font-size: 12px;
+    margin-left: 4px;
+  }
+}
+
+.seo-form {
+  background: var(--admin-panel);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  &__section h2,
+  &__section h3 {
+    margin: 0 0 8px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    span {
+      font-size: 13px;
+      color: var(--admin-muted);
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--admin-border);
+      font-family: inherit;
+      font-size: 14px;
+      background: var(--admin-bg);
+      color: var(--admin-text);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+  }
+}
+
+@media (max-width: 960px) {
+  .seo-grid {
+    grid-template-columns: 1fr;
+  }
+}

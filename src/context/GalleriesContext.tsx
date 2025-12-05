@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import type { GalleryConfig } from "../types/galleries";
+import { fetchJsonCached } from "../utils/fetchJsonCached";
 
 type GalleriesContextValue = {
   galleries: GalleryConfig[];
@@ -32,11 +33,7 @@ export const GalleriesProvider: React.FC<React.PropsWithChildren> = ({
     try {
       setLoading(true);
       setError(null);
-      const resp = await fetch("/data/galleries.json");
-      if (!resp.ok) {
-        throw new Error("Failed to load galleries");
-      }
-      const data = await resp.json();
+      const data = await fetchJsonCached("/data/galleries.json");
       setGalleries(Array.isArray(data.galleries) ? data.galleries : []);
     } catch (e: any) {
       setError(e?.message || "Failed to load galleries");

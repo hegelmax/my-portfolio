@@ -6,7 +6,7 @@
 
 .philosophy {
   width: 100%;
-  background: $color-bg-page;
+  background: var(--color-bg-body);
   padding: 120px 0;
 
   .philosophy__inner {
@@ -26,16 +26,16 @@
     max-width: 560px;
 
     .philosophy__title {
-      font-family: $font-serif;
-      color: $color-text-main;
+      font-family: var(--font-serif);
+      color: var(--color-text-main);
       font-size: 38px;
       font-weight: 500;
       margin-bottom: 26px;
     }
 
     .philosophy__lead {
-      font-family: $font-sans;
-      color: $color-text-muted;
+      font-family: var(--font-sans);
+      color: var(--color-text-muted);
       font-size: 16px;
       line-height: 1.7;
       margin-bottom: 22px;
@@ -45,21 +45,21 @@
       margin-top: 30px;
       display: inline-block;
 
-      font-family: $font-sans;
+      font-family: var(--font-sans);
       font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 0.14em;
-      color: $color-text-main;
+      color: var(--color-text-main);
 
       text-decoration: none;
-      border-bottom: 1px solid black;//rgba(black, 0.4);
+      border-bottom: 1px solid var(--color-border-hero);
       padding-bottom: 3px;
 
       transition: opacity 0.2s ease, border-color 0.2s ease;
 
       &:hover {
         opacity: 0.6;
-        border-color: black;//$black;
+        border-color: var(--color-border-hero);
       }
     }
   }
@@ -74,11 +74,13 @@
     gap: 20px;
 
     .philosophy__card {
+      transition: transform 0.4s ease-out;
+      will-change: transform;
 	  
 	  img {
       	width: 360px;
       	height: 260px;
-		border-radius: $radius-md;
+		border-radius: var(--radius-md);
 	  }
 
       &:nth-child(2) {

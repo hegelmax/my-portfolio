@@ -1,4 +1,5 @@
 <?php
+
 require_once '_init.php';
 
 header('Content-Type: application/json; charset=utf-8');

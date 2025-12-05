@@ -1,7 +1,7 @@
 @use "../../styles" as *;
 
 .projects-page {
-  background: $color-bg-page;
+  background: var(--color-bg-body);
 
   &__header {
     max-width: 1350px;
@@ -9,7 +9,7 @@
     padding: 0 40px;
 
     h1 {
-      font-family: $font-serif;
+      font-family: var(--font-serif);
       font-size: 48px;
     }
   }

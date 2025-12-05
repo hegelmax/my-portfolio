@@ -1,14 +1,14 @@
 @use "../../styles" as *;
 
-/* ===== Секция портфолио ===== */
+/* ===== Portfolio section ===== */
 
 .np-portfolio {
   width: 100%;
-  // padding-top: 80px; // при необходимости включишь
-  --np-grid-gap-y: 24px; // вертикальный отступ между рядами
-  --np-grid-gap-x: 24px; // суммарный горизонтальный зазор между колонками
+  // padding-top: 80px; // enable if needed
+  --np-grid-gap-y: 24px; // vertical gap between rows
+  --np-grid-gap-x: 24px; // total horizontal gap between columns
 
-  /* Заголовок */
+  /* Header */
   &__header {
     margin-bottom: 30px;
   }
@@ -26,9 +26,9 @@
     font-size: 14px;
   }
 
-  /* ===== Фильтры (табы) ===== */
+  /* ===== Filters (tabs) ===== */
 
-  // обёртка — позиционирование даётся из JS через style
+  // wrapper - positioning is passed from JS via inline style
   &__filters-wrap {
     margin: 30px 0 25px;
   }
@@ -37,33 +37,33 @@
     display: flex;
     flex-wrap: wrap;
     row-gap: 15px;
-    background: $color-bg-page;
+    background: var(--color-bg-body);
     padding: 8px 0;
   }
 
-  // спейсер под фиксированным блоком (высота задаётся inline-style)
+  // spacer under fixed block (height set via inline style)
   &__filters-spacer {
-    // по умолчанию нулевая высота
+    // default height is zero
   }
 
   &__filter {
     position: relative;
     border: none;
-    background-color: $color-filter-notactive;
+    background-color: var(--color-filter-notactive);
     padding: 10px 26px;
     font-size: 11px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     cursor: pointer;
-    color: $color-text-muted;
+    color: var(--color-text-muted);
 
     & + .np-portfolio__filter {
       margin-left: 4px;
     }
 
     &--active {
-      background-color: $color-filter-active;
-      color: $color-bg-page;
+      background-color: var(--color-filter-active);
+      color: var(--color-bg-body);
 
       &::after {
         content: "";
@@ -73,19 +73,19 @@
         transform: translateX(-50%);
         border-width: 6px 6px 0 6px;
         border-style: solid;
-        border-color: $color-filter-active transparent transparent transparent;
+        border-color: var(--color-filter-active) transparent transparent transparent;
       }
     }
   }
 
-  /* ===== GRID Isotope (4 / 3 / 2 / 1 колонки) ===== */
+  /* ===== GRID Isotope (4 / 3 / 2 / 1 columns) ===== */
 
   &__grid {
     position: relative;
-    // компенсируем внутренние паддинги колонок, чтобы края совпали
+    // compensate inner column padding so edges align
     margin: 0 -12px;
 
-    // базовая ширина колонки
+    // base column width
     .grid-sizer,
     .grid-item {
       width: 25%;
@@ -95,16 +95,16 @@
       width: 50%;
     }
 
-    /* Исходная плитка */
+    /* Base tile */
     .grid-item {
-      float: left; // оставляем float — он нужен Isotope
+      float: left; // keep float - Isotope relies on it
       box-sizing: border-box;
-      // горизонтальные отступы между столбцами + вертикальный
+      // horizontal padding between columns + vertical gap
       padding: 0 12px 24px;
       cursor: zoom-in;
     }
 
-    /* Адаптив */
+    /* Responsive */
     @media (max-width: 1200px) {
       .grid-sizer,
       .grid-item {
@@ -126,7 +126,7 @@
       }
     }
 
-    /* чтобы контейнер очистил float’ы */
+    /* clear floats for container */
     &::after {
       content: "";
       display: block;
@@ -134,15 +134,20 @@
     }
   }
 
-  /* Внутри — контейнер фиксированных пропорций */
+  /* Inner container with fixed proportions */
 
   &__item-inner {
     position: relative;
     width: 100%;
     overflow: hidden;
+    background: var(--color-bg-body);
   }
 
-  /* Пропорции карточек */
+  &__item-inner--contain {
+    background: var(--color-bg-body);
+  }
+
+  /* Card proportions */
 
   .ratio-1x1 &__item-inner::before,
   .ratio-1x2 &__item-inner::before,
@@ -156,18 +161,22 @@
     padding-bottom: 100%;
   }
 
-  // широкая плитка: 2 колонки по ширине, высота как у квадрата
+  // vertical 1:2 (1 column, 2 rows)
   .ratio-1x2 &__item-inner::before {
-    padding-bottom: calc(50% - var(--np-grid-gap-x) / 4);
-  }
-
-  // вертикальный 2:1 (1 колонка, 2 ряда)
-  .ratio-2x1 &__item-inner::before,
-  .ratio-2x2 &__item-inner::before {
     padding-bottom: calc(200% + var(--np-grid-gap-y));
   }
 
-  /* Картинка заполняет контейнер */
+  // wide tile: spans 2 columns, height same as square
+  .ratio-2x1 &__item-inner::before {
+    padding-bottom: calc(50% - var(--np-grid-gap-x) / 2);
+  }
+
+  // large tile 2x2: width 2 columns, height 2 rows (plus gap)
+  .ratio-2x2 &__item-inner::before {
+    padding-bottom: calc(100% + var(--np-grid-gap-y));
+  }
+
+  /* Image fills container */
 
   &__img {
     position: absolute;
@@ -177,6 +186,7 @@
     object-fit: cover;
     display: block;
     transition: transform 0.3s ease;
+    transform: var(--np-img-transform, none);
   }
 
   /* Overlay */
@@ -184,8 +194,8 @@
   &__overlay {
     position: absolute;
     inset: 0;
-    background: $color-overlay-0;
-    color: $color-bg-page;
+    background: var(--color-overlay-0);
+    color: var(--color-bg-body);
     opacity: 0;
     display: flex;
     align-items: flex-end;
@@ -217,15 +227,15 @@
   &__item:hover {
     .np-portfolio__overlay {
       opacity: 1;
-      background: $color-overlay-55;
+      background: var(--color-overlay-55);
     }
 
     .np-portfolio__img {
-      transform: scale(1.03);
+      transform: var(--np-img-transform, none) scale(1.03);
     }
   }
 
-  /* ===== Лайтбокс ===== */
+  /* ===== Lightbox ===== */
 
   &__lightbox {
     position: fixed;
@@ -234,7 +244,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: $color-backdrop-80;
+    background: var(--color-backdrop-80);
   }
 
   &__lightbox-inner {
@@ -254,10 +264,10 @@
   &__lightbox-caption {
     margin-top: 12px;
     text-align: center;
-    color: $color-bg-page;
+    color: var(--color-bg-body);
   }
 
-  /* Крестик – в верхнем правом углу окна, а не картинки */
+  /* Close button - top right corner of viewport, not the image */
   &__lightbox-close {
     position: fixed;
     top: 20px;
@@ -265,15 +275,15 @@
     z-index: 10000;
     font-size: 28px;
     line-height: 1;
-    color: $color-bg-page;
-    background: $color-backdrop-60;
+    color: var(--color-bg-body);
+    background: var(--color-backdrop-60);
     border: none;
     border-radius: 999px;
     padding: 6px 12px;
     cursor: pointer;
   }
 
-  /* Стрелки – по бокам экрана, не поверх картинки */
+  /* Arrows - at screen sides, not over the image */
   &__lightbox-nav {
     position: fixed;
     top: 50%;
@@ -281,8 +291,8 @@
     z-index: 10000;
     font-size: 32px;
     line-height: 1;
-    color: $color-bg-page;
-    background: $color-backdrop-60;
+    color: var(--color-bg-body);
+    background: var(--color-backdrop-60);
     border: none;
     border-radius: 999px;
     padding: 8px 14px;

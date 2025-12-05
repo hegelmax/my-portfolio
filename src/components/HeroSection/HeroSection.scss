@@ -10,14 +10,14 @@
   justify-content: center;
   gap: 80px;
   padding-top: 80px;
-  background: $color-bg-page;
+  background: var(--color-bg-body);
 
   .h1,.h2 {
     font-family: 'Playfair Display', serif;
   }
 
  /* ============================
-     Портрет (левая часть)
+     Portrait (left part)
   ============================= */
   .left_part {
     flex: 0 0 500px;
@@ -49,27 +49,27 @@
     display: block;
     width: 100%;
     height: auto;
-    opacity: 0; /* картинка служит только для пропорций */
+    opacity: 0; /* image is only for proportions */
   }
 
-  /* Чёрная рамка */
+  /* Black frame */
   .border {
     position: absolute;
-    border: 7px solid $color-border-hero;
+    border: 7px solid var(--color-border-hero);
     z-index: 5;
   }
 
-  /* Жёлтый блок с точками */
+  /* Yellow block with dots */
   .dots {
     position: absolute;
-    background-color: $color-main;
+    background-color: var(--color-hero-bg-dots);
     top: 80px !important;
     bottom: 80px !important;
     left: -20px !important;
     right: -20px !important;
   }
 
-  /* Абсолютное реальное изображение */
+  /* Absolute positioned real image */
   .abs_img {
     position: absolute;
     inset: 30px;
@@ -80,20 +80,20 @@
   }
 
   /* ============================
-     Правая часть (текст)
+     Right part (text)
   ============================= */
   .right_part {
     flex: 0 0 auto;
   
     .hero_title {
-      font-family: $font-serif;
-      color: $color-text-main;
+      font-family: var(--font-serif);
+      color: var(--color-text-main);
 
-      /* маленький овертайтл PORTFOLIO */
+      /* small overtitle PORTFOLIO */
       &__kicker {
-        font-family: $font-header;
+        font-family: var(--font-header);
         text-transform: uppercase;
-        color: $color-text-caption;
+        color: var(--color-text-caption);
         margin-bottom: 20px;
         font-size:16px;
         letter-spacing:4.8px;
@@ -108,10 +108,10 @@
 
         span {
           display: block;
-          font-family: $font-header;
+          font-family: var(--font-header);
         }
 
-        /* вторая строка Designer — курсив + подчёркивание */
+        /* second line Designer - italic + underline */
         .hero_title__secondary {
           font-style: italic;
           position: relative;
@@ -123,27 +123,29 @@
             bottom: -10px;
             width: 100%;
             height: 3px;
-            background: $color-text-main;
+            background: var(--color-text-main);
           }
         }
       }
 
-      /* основной текст */
+      /* main text */
       .hero_lead {
-        font-family: $font-ui;
+        font-family: var(--font-ui);
         font-size: 16px;
         line-height: 1.7;
-        color: $color-text-caption;
+        color: var(--color-text-caption);
         margin: 0 0 30px;
         max-width: 420px;
       }
 
-      /* подпись */
-      img {
+      /* signature */
+      .hero_signature {
         max-width: 190px;
+        display: block;
+        margin: 10px 0 0 auto;
       }
 
-      /* кнопки */
+      /* buttons */
       .hero_actions {
         margin: 40px;
         display: flex;
@@ -158,39 +160,39 @@
     align-items: center;
     justify-content: center;
     padding: 12px 28px;
-    font-family: $font-sans;
+    font-family: var(--font-sans);
     font-size: 13px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    border-radius: $radius-pill;
+    border-radius: var(--radius-pill);
     border: 1px solid transparent;
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 
     &--primary {
-      background: $color-cta-bg;
-      border-color: $color-cta-bg;
-      color: $color-text-contrast;
+      background: var(--color-cta-bg);
+      border-color: var(--color-cta-bg);
+      color: var(--color-text-contrast);
 
       &:hover {
-        background: $color-cta-hover-bg;
-        border-color: $color-cta-hover-bg;
+        background: var(--color-cta-hover-bg);
+        border-color: var(--color-cta-hover-bg);
       }
     }
 
     &--ghost {
-      background: $color-bg-page;
-      border-color: $color-border-light;
-      color: $color-text-main;
+      background: var(--color-bg-body);
+      border-color: var(--color-border-light);
+      color: var(--color-text-main);
 
       &:hover {
-        background: $color-text-caption;
+        background: var(--color-text-caption);
       }
     }
   }
 
   /* ============================
-     Адаптив
+     Responsive
   ============================= */
 
   @media (max-width: 1300px) {
@@ -248,11 +250,15 @@
           bottom: -10px;
           width: 100%;
           height: 3px;
-          background: $color-text-main;
+          background: var(--color-text-main);
         }
 
         .hero_lead {
           margin: 0 auto 24px;
+        }
+
+        .hero_signature {
+          margin: 12px auto 0;
         }
 
         .hero_actions {
@@ -274,7 +280,7 @@
     }
 
     .hero_signature {
-      font-size: 24px;
+      margin: 12px auto 0;
     }
   }
 }

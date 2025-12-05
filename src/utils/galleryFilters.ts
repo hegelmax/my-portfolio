@@ -31,12 +31,16 @@ export const filterMatchesMedia = (
   return clauses.some((clause) => clauseMatches(clause, tagsSet));
 };
 
+const clampPercent = (value?: number) => {
+  if (typeof value !== "number" || Number.isNaN(value)) return undefined;
+  return Math.min(100, Math.max(0, value));
+};
+
 const formatFromDimensions = (width?: number, height?: number): GalleryItem["format"] => {
   if (!width || !height) return "1:1";
   const ratio = width / height;
   if (ratio >= 1.6) return "2:1";
   if (ratio <= 0.625) return "1:2";
-  if (ratio >= 1.2 && ratio <= 1.4) return "2:2";
   return "1:1";
 };
 
@@ -62,13 +66,30 @@ export const buildGalleryItems = (
 
       const categories = [defaultFilterId, ...matchedFilters];
 
+      const format =
+        media.format && ["1:1", "1:2", "2:1", "2:2"].includes(media.format)
+          ? media.format
+          : formatFromDimensions(media.width, media.height);
+
+      const fit = media.fit === "contain" ? "contain" : "cover";
+      const focusX = clampPercent(media.focusX);
+      const focusY = clampPercent(media.focusY);
+      const rotation =
+        typeof media.rotation === "number" && Number.isFinite(media.rotation)
+          ? ((media.rotation % 360) + 360) % 360
+          : undefined;
+
       return {
         id: `media-${media.id ?? media.path}`,
         title: media.filename || media.path.split("/").pop() || "Image",
         image: media.path,
         categories,
         tags: media.tags ?? [],
-        format: formatFromDimensions(media.width, media.height),
+        format,
+        focusX,
+        focusY,
+        fit,
+        rotation,
       };
     })
     .filter(Boolean) as GalleryItem[];
